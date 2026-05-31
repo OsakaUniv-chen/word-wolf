@@ -171,17 +171,14 @@
       color: var(--accent-dark);
     }
 
-    video,
-    img.placement {
+    video {
       display: block;
       width: 100%;
       max-width: 100%;
+      aspect-ratio: 16 / 9;
       background: #111;
       border-radius: var(--radius);
       border: 1px solid var(--line);
-    }
-
-    video {
       pointer-events: none;
       user-select: none;
     }
@@ -192,48 +189,22 @@
     video::-webkit-media-controls-panel,
     video::-webkit-media-controls-play-button,
     video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-current-time-display,
+    video::-webkit-media-controls-time-remaining-display,
     video::-webkit-media-controls-volume-slider,
     video::-webkit-media-controls-fullscreen-button,
-    video::-webkit-media-controls-overlay-play-button {
+    video::-webkit-media-controls-overlay-play-button,
+    video::-webkit-media-controls-mute-button {
       display: none !important;
     }
 
-    .media-wrap {
-      display: block;
-      width: 100%;
-    }
-
-    .locked-preview {
-      position: relative;
+    img.placement {
       display: block;
       width: 100%;
       max-width: 100%;
-      aspect-ratio: 16 / 9;
-      min-height: 320px;
-      overflow: hidden;
-      background: #111;
+      background: #fff;
       border-radius: var(--radius);
       border: 1px solid var(--line);
-    }
-
-    .locked-preview iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      pointer-events: none;
-    }
-
-    /* Dark gradient covers Drive's floating control bar, blending with video content */
-    .locked-preview-cover {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 64px;
-      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.92));
-      pointer-events: auto;
-      z-index: 2;
     }
 
     .media-controls {
@@ -260,13 +231,6 @@
       color: var(--muted);
     }
 
-    img.placement {
-      background: #fff;
-      display: block;
-      width: 100%;
-      margin: 0;
-    }
-
     .placement-block {
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -275,9 +239,7 @@
       background: #fbfbfa;
     }
 
-    .placement-block h3 {
-      margin-bottom: 12px;
-    }
+    .placement-block h3 { margin-bottom: 12px; }
 
     .question {
       border-top: 1px solid var(--line);
@@ -294,13 +256,8 @@
       background: #fbfbfa;
     }
 
-    .question-block > h3 {
-      margin-bottom: 6px;
-    }
-
-    .question-block-note {
-      margin: 0 0 12px;
-    }
+    .question-block > h3 { margin-bottom: 6px; }
+    .question-block-note { margin: 0 0 12px; }
 
     .scale {
       display: grid;
@@ -341,7 +298,6 @@
       .grid { display: block; }
 
       section { padding: 18px; }
-
       .grid > div { margin-bottom: 14px; }
 
       .scale {
@@ -433,13 +389,7 @@
       <p>評価いただく動画では、3名のプレイヤーが「ワードウルフ」というゲームを行っています。3人のうち2人には同じお題、1人には少し違うお題が与えられます。会話を通して、誰が少数派のウルフかを推理します。</p>
       <p>あなたの役割は、動画を視聴して誰がウルフだったかを推測し、動画内のロボットやプレイヤーの様子を評価することです。</p>
       <h3>ルール説明動画</h3>
-      <div class="media-wrap">
-        <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
-        <div id="introPreviewWrap" class="locked-preview hidden">
-          <iframe id="introVideoPreview" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
-        </div>
-      </div>
+      <video id="introVideo" disablepictureinpicture playsinline preload="none"></video>
       <div class="button-row">
         <button id="toPracticeButton" type="button">練習セッションへ進む</button>
       </div>
@@ -448,13 +398,7 @@
     <section id="practiceSection" class="hidden">
       <h2>練習セッション</h2>
       <p>本番の前に、練習用の短い動画で回答の流れを確認してください。この回答は研究分析データには含めませんが、回答記録として保存します。</p>
-      <div class="media-wrap">
-        <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
-        <div id="practicePreviewWrap" class="locked-preview hidden">
-          <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
-        </div>
-      </div>
+      <video id="practiceVideo" disablepictureinpicture playsinline preload="none"></video>
       <div class="placement-block">
         <h3>プレイヤーA/B/Cの配置</h3>
         <img id="practicePlacementImage" class="placement" src="" alt="練習セッションのプレイヤー配置">
@@ -488,13 +432,7 @@
       <div class="progress" id="videoProgress"></div>
       <h2 id="videoTitle"></h2>
       <p>動画を最後まで視聴すると、下のアンケートが回答できるようになります。</p>
-      <div class="media-wrap">
-        <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
-        <div id="studyPreviewWrap" class="locked-preview hidden">
-          <iframe id="studyVideoPreview" title="評価対象動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
-        </div>
-      </div>
+      <video id="studyVideo" disablepictureinpicture playsinline preload="none"></video>
       <div id="seekNotice" class="status hidden">動画の早送りはできません。視聴済みの位置に戻しました。</div>
 
       <div class="placement-block">
@@ -537,10 +475,6 @@
       maxSubmitAttempts: 3
     };
 
-    const INTRO_VIDEO_SECONDS = 93.1;
-    const PRACTICE_VIDEO_SECONDS = 190.1;
-    const STUDY_VIDEO_SECONDS = 185.1;
-
     const ROBOT_ITEMS = [
       ["q03", "偽物のような", "自然な"],
       ["q04", "機械的", "人間的"],
@@ -563,7 +497,7 @@
       ["q21", "知的でない", "知的な"],
       ["q22", "愚かな", "賢明な"],
       ["q23", "不安な", "落ち着いた"],
-      ["q24", "動揑している", "冷静な"],
+      ["q24", "動揺している", "冷静な"],
       ["q25", "平穏な", "驚いた"]
     ];
 
@@ -619,7 +553,6 @@
       try {
         const params = new URLSearchParams(window.location.search);
         state.workerId = params.get("workerId") || "";
-        state.evalSetId = "";
         $("workerBadge").textContent = state.workerId ? `Worker: ${state.workerId}` : "";
         $("workerIdField").value = state.workerId;
         $("workerIdField").readOnly = true;
@@ -637,21 +570,21 @@
           return;
         }
 
-        state.videos.forEach((video) => {
-          video.fileName = `${video.stem}.mp4`;
-          video.imageName = `${video.stem}.jpg`;
+        state.videos.forEach((v) => {
+          v.fileName = `${v.stem}.mp4`;
+          v.imageName = `${v.stem}.jpg`;
         });
 
         await Promise.all([
-          setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS),
-          setVideoSource($("practiceVideo"), "practice-session.mp4", $("practicePreviewWrap"), $("practiceVideoPreview"), PRACTICE_VIDEO_SECONDS),
+          setVideoSource($("introVideo"), "Word-wolf-intro.mp4"),
+          setVideoSource($("practiceVideo"), "practice-session.mp4"),
           setImageSource($("practicePlacementImage"), "practice-session.jpg")
         ]);
         bindEvents();
         showOnly("introSection");
       } catch (error) {
         console.error(error);
-        showFatal("初期化中にエラーが発生しました。時間をおいて再度アクセスしてください。");
+        showFatal(`初期化中にエラーが発生しました: ${error.message}`);
       }
     }
 
@@ -683,7 +616,6 @@
     async function onPracticeSubmit(event) {
       event.preventDefault();
       state.practiceAnswer = new FormData(event.currentTarget).get("practiceWolf");
-      $("form1Status").textContent = "";
       $("practiceAnswerText").innerHTML = renderAnswerFeedback(state.practiceAnswer, "A");
       showOnly("practiceAnswerSection");
     }
@@ -696,10 +628,7 @@
     async function showVideo() {
       const video = state.videos[state.currentIndex];
       state.currentVideo = video;
-      state.videoGuard = {
-        maxWatchedSeconds: 0,
-        completed: false
-      };
+      state.videoGuard = { maxWatchedSeconds: 0, completed: false };
 
       $("videoProgress").textContent = `${state.currentIndex + 1} / ${state.videos.length} 本目`;
       $("videoTitle").textContent = `${state.currentIndex + 1}本目の評価`;
@@ -714,18 +643,14 @@
       const studyVideo = $("studyVideo");
       clearVideoSource(studyVideo);
       installVideoGuard(studyVideo);
-      await setVideoSource(studyVideo, video.fileName, $("studyPreviewWrap"), $("studyVideoPreview"), STUDY_VIDEO_SECONDS, unlockQuestionnaire);
+      await setVideoSource(studyVideo, video.fileName);
       showOnly("experimentSection");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function installVideoGuard(video) {
       applyVideoRestrictions(video);
-      video.onratechange = () => {
-        if (video.playbackRate !== 1) {
-          video.playbackRate = 1;
-        }
-      };
+      video.onratechange = () => { if (video.playbackRate !== 1) video.playbackRate = 1; };
       video.ontimeupdate = () => {
         if (!video.seeking && state.videoGuard) {
           state.videoGuard.maxWatchedSeconds = Math.max(state.videoGuard.maxWatchedSeconds, video.currentTime);
@@ -739,9 +664,7 @@
           flashSeekNotice();
         }
       };
-      video.onended = () => {
-        unlockQuestionnaire();
-      };
+      video.onended = () => unlockQuestionnaire();
     }
 
     function unlockQuestionnaire() {
@@ -762,7 +685,7 @@
       video.disableRemotePlayback = true;
       video.setAttribute("disableremoteplayback", "");
       video.setAttribute("tabindex", "-1");
-      video.oncontextmenu = (event) => event.preventDefault();
+      video.oncontextmenu = (e) => e.preventDefault();
       video.playbackRate = 1;
       video.defaultPlaybackRate = 1;
       installCustomVideoControls(video);
@@ -775,55 +698,37 @@
       const controls = document.createElement("div");
       controls.className = "media-controls";
       controls.innerHTML = `<button type="button" class="media-play">再生</button><span class="media-memo muted small">※ 再生後は停止・操作できません</span><span class="media-time"></span>`;
-
-      const wrap = video.closest(".media-wrap");
-      const insertTarget = wrap || video;
-      insertTarget.insertAdjacentElement("afterend", controls);
+      video.insertAdjacentElement("afterend", controls);
 
       const playButton = controls.querySelector(".media-play");
       const memoSpan = controls.querySelector(".media-memo");
       const timeSpan = controls.querySelector(".media-time");
 
       playButton.addEventListener("click", async () => {
-        if (video._previewController) {
-          video._previewController.play();
-          return;
-        }
         if (video.paused || video.ended) {
           try { await video.play(); } catch (e) { console.error("Playback blocked:", e); }
         }
       });
 
       const syncControls = () => {
-        if (video._previewController) {
-          const ctrl = video._previewController;
-          const playing = ctrl.playing;
-          playButton.style.display = playing ? "none" : "";
-          memoSpan.style.display = playing ? "none" : "";
-          timeSpan.textContent = playing && ctrl.totalSeconds > 0
-            ? `${formatTime(ctrl.elapsed)} / ${formatTime(ctrl.totalSeconds)}`
-            : "";
-        } else {
-          const isPlaying = !video.paused && !video.ended;
-          playButton.style.display = isPlaying ? "none" : "";
-          memoSpan.style.display = isPlaying ? "none" : "";
-          const total = isFinite(video.duration) ? video.duration : 0;
-          timeSpan.textContent = isPlaying && total > 0
-            ? `${formatTime(video.currentTime)} / ${formatTime(total)}`
-            : "";
-        }
+        const isPlaying = !video.paused && !video.ended;
+        playButton.style.display = isPlaying ? "none" : "";
+        memoSpan.style.display = isPlaying ? "none" : "";
+        const total = isFinite(video.duration) ? video.duration : 0;
+        timeSpan.textContent = isPlaying && total > 0
+          ? `${formatTime(video.currentTime)} / ${formatTime(total)}`
+          : "";
       };
 
-      ["loadstart", "loadedmetadata", "timeupdate", "play", "pause", "ended", "durationchange", "previewstatechange"].forEach((eventName) => {
-        video.addEventListener(eventName, syncControls);
+      ["loadstart", "loadedmetadata", "timeupdate", "play", "pause", "ended", "durationchange"].forEach((ev) => {
+        video.addEventListener(ev, syncControls);
       });
       syncControls();
     }
 
     function formatTime(seconds) {
       const s = Math.floor(seconds || 0);
-      const m = Math.floor(s / 60);
-      return `${m}:${String(s % 60).padStart(2, "0")}`;
+      return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
     }
 
     function flashSeekNotice() {
@@ -835,16 +740,11 @@
     function renderQuestionnaire() {
       const mount = $("questionMount");
       mount.textContent = "";
-      mount.appendChild(renderQuestionBlock("ウルフ推測", "", [
-        renderWolfGuess(),
-        renderReason()
-      ]));
-      mount.appendChild(renderQuestionBlock("ロボットの印象評価", "ロボットについて、あなたの率直な印象をお伺いします。", (
-        shuffle(ROBOT_ITEMS).map((item) => renderBipolarScale(item[0], item[1], item[2]))
-      )));
-      mount.appendChild(renderQuestionBlock("第三者視点から見るプレイヤーのゲーム体験", "あなたは、第三者評価者として、自分自身の体験ではなく、動画内のプレイヤーがどのように見えたかを評価します。", (
-        shuffle(PLAYER_ITEMS).map((item) => renderAgreementScale(item[0], item[1]))
-      )));
+      mount.appendChild(renderQuestionBlock("ウルフ推測", "", [renderWolfGuess(), renderReason()]));
+      mount.appendChild(renderQuestionBlock("ロボットの印象評価", "ロボットについて、あなたの率直な印象をお伺いします。",
+        shuffle(ROBOT_ITEMS).map((item) => renderBipolarScale(item[0], item[1], item[2]))));
+      mount.appendChild(renderQuestionBlock("第三者視点から見るプレイヤーのゲーム体験", "あなたは、第三者評価者として、自分自身の体験ではなく、動画内のプレイヤーがどのように見えたかを評価します。",
+        shuffle(PLAYER_ITEMS).map((item) => renderAgreementScale(item[0], item[1]))));
       mount.appendChild(renderQuestionBlock("ロボットとのインタラクションの楽しさ", "", [
         renderAgreementScale("q48", "動画に基づいて、プレイヤーはロボットとのインタラクションをどの程度楽しんでいたように見えましたか？", "まったく楽しんでいなかったように見えた", "とても楽しんでいたように見えた")
       ]));
@@ -873,8 +773,7 @@
     function renderReason() {
       const div = document.createElement("div");
       div.className = "question";
-      div.innerHTML = `
-        <label for="q02">そのように考えた理由を簡単に記入してください 任意</label>
+      div.innerHTML = `<label for="q02">そのように考えた理由を簡単に記入してください 任意</label>
         <textarea id="q02" name="q02"></textarea>`;
       return div;
     }
@@ -884,7 +783,7 @@
       div.className = "question";
       div.innerHTML = `<div class="scale" role="radiogroup" aria-label="${escapeHtml(left)} - ${escapeHtml(right)}">
         <div>${escapeHtml(left)}</div>
-        ${[1, 2, 3, 4, 5].map((value) => `<label class="point"><input type="radio" name="${name}" value="${value}" required> ${value}</label>`).join("")}
+        ${[1,2,3,4,5].map((v) => `<label class="point"><input type="radio" name="${name}" value="${v}" required> ${v}</label>`).join("")}
         <div>${escapeHtml(right)}</div>
       </div>`;
       return div;
@@ -895,7 +794,7 @@
       div.className = "question";
       div.innerHTML = `<div>${escapeHtml(text)}</div><div class="scale" role="radiogroup" aria-label="${escapeHtml(text)}">
         <div>${escapeHtml(low)}</div>
-        ${[1, 2, 3, 4, 5].map((value) => `<label class="point"><input type="radio" name="${name}" value="${value}" required> ${value}</label>`).join("")}
+        ${[1,2,3,4,5].map((v) => `<label class="point"><input type="radio" name="${name}" value="${v}" required> ${v}</label>`).join("")}
         <div>${escapeHtml(high)}</div>
       </div>`;
       return div;
@@ -930,9 +829,7 @@
         if (!state.submittedVideos.includes(video.video_code)) {
           state.submittedVideos.push(video.video_code);
         }
-        if (result.completionCode) {
-          state.completionCode = result.completionCode;
-        }
+        if (result.completionCode) state.completionCode = result.completionCode;
         $("answerText").innerHTML = renderAnswerFeedback(responses.wolf, result.correctWolf);
         $("nextVideoButton").textContent = state.currentIndex + 1 >= state.videos.length ? "完了画面へ進む" : "次の動画へ進む";
         showOnly("answerSection");
@@ -948,13 +845,10 @@
       const selected = selectedWolf || "未回答";
       const correct = correctWolf || "不明";
       const isCorrect = selected === correct;
-      const message = isCorrect
-        ? "正解です。おめでとうございます！"
-        : "残念、今回は不正解でした。次の動画でまた挑戦してください。";
       return [
         `あなたの回答は「${escapeHtml(selected)}」でした。`,
         `このゲームの正解 ウルフ は「${escapeHtml(correct)}」でした。`,
-        `<strong>${escapeHtml(message)}</strong>`
+        `<strong>${escapeHtml(isCorrect ? "正解です。おめでとうございます！" : "残念、今回は不正解でした。次の動画でまた挑戦してください。")}</strong>`
       ].join("<br>");
     }
 
@@ -963,12 +857,8 @@
         wolf: formData.get("q01"),
         wolf_memo: String(formData.get("q02") || "").trim()
       };
-      for (let n = 3; n <= 25; n += 1) {
-        responses[`gqs${n - 2}`] = formData.get(`q${String(n).padStart(2, "0")}`);
-      }
-      for (let n = 26; n <= 47; n += 1) {
-        responses[`geq${n - 25}`] = formData.get(`q${String(n).padStart(2, "0")}`);
-      }
+      for (let n = 3; n <= 25; n++) responses[`gqs${n - 2}`] = formData.get(`q${String(n).padStart(2, "0")}`);
+      for (let n = 26; n <= 47; n++) responses[`geq${n - 25}`] = formData.get(`q${String(n).padStart(2, "0")}`);
       responses["hri-cues"] = formData.get("q48");
       return responses;
     }
@@ -1005,10 +895,7 @@
         enterAt: state.enterAt,
         submitAt: new Date().toISOString(),
         participant: state.participant,
-        practice: {
-          answer: state.practiceAnswer,
-          correctAnswer: "A"
-        },
+        practice: { answer: state.practiceAnswer, correctAnswer: "A" },
         videos: state.videos,
         pageTimes: state.pageTimes
       });
@@ -1021,7 +908,7 @@
 
     async function submitPayloadWithRetry(payload) {
       let lastError = null;
-      for (let attempt = 1; attempt <= CONFIG.maxSubmitAttempts; attempt += 1) {
+      for (let attempt = 1; attempt <= CONFIG.maxSubmitAttempts; attempt++) {
         try {
           return await submitPayloadOnce(payload);
         } catch (error) {
@@ -1051,121 +938,12 @@
       return data;
     }
 
-    async function setVideoSource(video, fileName, previewWrap = null, previewFrame = null, durationSeconds = 0, previewEnded = null) {
+    async function setVideoSource(video, fileName) {
       clearVideoSource(video);
       applyVideoRestrictions(video);
-      video.classList.remove("hidden");
-      setCustomControlsVisible(video, true);
-      resetLockedPreview(video, previewWrap, previewFrame);
-      video.load();
       const sourceUrl = await resolveMediaUrl("videoUrl", fileName);
-      const previewUrl = drivePreviewUrl(sourceUrl);
-      if (previewWrap && previewFrame && previewUrl) {
-        showLockedPreview(video, previewWrap, previewFrame, previewUrl, durationSeconds, previewEnded);
-        return;
-      }
-      video.onerror = () => console.error(`Video failed to load: ${fileName}`);
-      video.src = sourceUrl;
+      video.src = driveDirectUrl(sourceUrl);
       video.load();
-    }
-
-    function showLockedPreview(video, previewWrap, previewFrame, previewUrl, durationSeconds = 0, previewEnded = null) {
-      clearVideoSource(video);
-      video.classList.add("hidden");
-      setCustomControlsVisible(video, true);
-      previewWrap.classList.remove("hidden");
-      previewFrame.dataset.previewUrl = previewUrl;
-      // Do not set frame.src yet — load only when user clicks play
-      video._previewController = createPreviewController(video, previewFrame, previewWrap, previewUrl, durationSeconds, previewEnded);
-      video.dispatchEvent(new Event("previewstatechange"));
-    }
-
-    function resetLockedPreview(video, previewWrap, previewFrame) {
-      if (video && video._previewController) {
-        video._previewController.destroy();
-        video._previewController = null;
-        video.dispatchEvent(new Event("previewstatechange"));
-      }
-      if (!previewWrap || !previewFrame) return;
-      previewFrame.removeAttribute("src");
-      previewFrame.removeAttribute("data-preview-url");
-      previewWrap.classList.add("hidden");
-    }
-
-    function createPreviewController(video, frame, previewWrap, previewUrl, durationSeconds = 0, endedCallback = null) {
-      let endTimerId = 0;
-      let tickerId = 0;
-      let elapsedSeconds = 0;
-
-      function startEndTimer() {
-        if (durationSeconds <= 0) return;
-        endTimerId = window.setTimeout(() => {
-          endTimerId = 0;
-          controller.playing = false;
-          stopTicker();
-          video.dispatchEvent(new Event("previewstatechange"));
-          if (typeof endedCallback === "function") endedCallback();
-        }, Math.ceil((durationSeconds + 1) * 1000));
-      }
-
-      function clearEndTimer() {
-        if (endTimerId) { window.clearTimeout(endTimerId); endTimerId = 0; }
-      }
-
-      function startTicker() {
-        if (tickerId) return;
-        tickerId = window.setInterval(() => {
-          elapsedSeconds += 1;
-          controller.elapsed = elapsedSeconds;
-          video.dispatchEvent(new Event("previewstatechange"));
-        }, 1000);
-      }
-
-      function stopTicker() {
-        if (tickerId) { window.clearInterval(tickerId); tickerId = 0; }
-      }
-
-      const controller = {
-        playing: false,
-        elapsed: 0,
-        totalSeconds: durationSeconds,
-        toggle() {
-          if (controller.playing) {
-            controller.stop();
-          } else {
-            controller.play();
-          }
-        },
-        play() {
-          // Each play reloads from beginning (Drive iframes cannot seek)
-          elapsedSeconds = 0;
-          controller.elapsed = 0;
-          clearEndTimer();
-          stopTicker();
-          frame.src = withAutoplay(previewUrl);
-          controller.playing = true;
-          startEndTimer();
-          startTicker();
-          video.dispatchEvent(new Event("previewstatechange"));
-        },
-        stop() {
-          clearEndTimer();
-          stopTicker();
-          controller.playing = false;
-          elapsedSeconds = 0;
-          controller.elapsed = 0;
-          frame.src = "";  // unloads iframe — video actually stops
-          video.dispatchEvent(new Event("previewstatechange"));
-        },
-        destroy() {
-          clearEndTimer();
-          stopTicker();
-          controller.playing = false;
-          frame.removeAttribute("src");
-          video.dispatchEvent(new Event("previewstatechange"));
-        }
-      };
-      return controller;
     }
 
     async function setImageSource(image, fileName) {
@@ -1181,14 +959,6 @@
       throw new Error(`No URL returned for ${fileName}`);
     }
 
-    function setCustomControlsVisible(video, visible) {
-      const wrap = video.closest(".media-wrap");
-      const controls = wrap ? wrap.nextElementSibling : video.nextElementSibling;
-      if (controls && controls.classList.contains("media-controls")) {
-        controls.classList.toggle("hidden", !visible);
-      }
-    }
-
     function driveFileId(url) {
       const queryMatch = /[?&]id=([^&]+)/.exec(url);
       if (queryMatch) return decodeURIComponent(queryMatch[1]);
@@ -1196,13 +966,9 @@
       return pathMatch ? decodeURIComponent(pathMatch[1]) : "";
     }
 
-    function drivePreviewUrl(url) {
+    function driveDirectUrl(url) {
       const id = driveFileId(url);
-      return id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : "";
-    }
-
-    function withAutoplay(url) {
-      return url.includes("?") ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+      return id ? `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}&confirm=t` : url;
     }
 
     function driveImageUrl(url) {
@@ -1236,8 +1002,9 @@
 
     function showOnly(sectionId) {
       recordCurrentPageTime();
-      stopAllMedia(sectionId);
-      ["loadingSection", "fatalSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      document.querySelectorAll("video").forEach((v) => v.pause());
+      ["loadingSection", "fatalSection", "introSection", "rulesSection", "practiceSection",
+       "practiceAnswerSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
@@ -1265,26 +1032,6 @@
       state.nextPageNumber = state.pageTimes.length + 1;
     }
 
-    function stopAllMedia(activeSectionId) {
-      document.querySelectorAll("video").forEach(pauseMedia);
-      document.querySelectorAll(".locked-preview iframe").forEach((frame) => {
-        const section = frame.closest("section");
-        const isVisible = section && !section.classList.contains("hidden");
-        if (frame.src && isVisible && section.id !== activeSectionId) {
-          frame.src = "";
-        }
-      });
-    }
-
-    function pauseMedia(video) {
-      if (!video) return;
-      if (video._previewController) {
-        video._previewController.stop();
-        return;
-      }
-      video.pause();
-    }
-
     function clearVideoSource(video) {
       if (!video) return;
       video.pause();
@@ -1299,7 +1046,7 @@
 
     function shuffle(items) {
       const copy = [...items];
-      for (let i = copy.length - 1; i > 0; i -= 1) {
+      for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [copy[i], copy[j]] = [copy[j], copy[i]];
       }
@@ -1307,13 +1054,7 @@
     }
 
     function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "\"": "&quot;",
-        "'": "&#039;"
-      }[char]));
+      return String(value).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
     }
   </script>
 </body>
