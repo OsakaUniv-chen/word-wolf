@@ -207,19 +207,21 @@
     .locked-preview iframe {
       display: block;
       width: 100%;
-      /* Extend iframe beyond container so Drive's control bar overflows and gets clipped */
-      height: calc(100% + 48px);
+      height: 100%;
       border: 0;
       pointer-events: none;
     }
 
-    /* Fully opaque overlay shown while paused — keeps iframe loaded at correct position */
-    .preview-pause-overlay {
+    /* Gradient fade covers Drive's floating control bar without a solid block */
+    .locked-preview-cover {
       position: absolute;
-      inset: 0;
-      background: #111;
-      z-index: 3;
-      display: none;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 56px;
+      background: linear-gradient(to bottom, transparent, #fff);
+      pointer-events: auto;
+      z-index: 2;
     }
 
     .media-controls {
@@ -419,6 +421,7 @@
         <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="introPreviewWrap" class="locked-preview hidden">
           <iframe id="introVideoPreview" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div class="button-row">
@@ -433,6 +436,7 @@
         <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="practicePreviewWrap" class="locked-preview hidden">
           <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div class="placement-block">
@@ -472,6 +476,7 @@
         <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="studyPreviewWrap" class="locked-preview hidden">
           <iframe id="studyVideoPreview" title="評価対象動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div id="seekNotice" class="status hidden">動画の早送りはできません。視聴済みの位置に戻しました。</div>
@@ -782,14 +787,14 @@
         if (video._previewController) {
           const ctrl = video._previewController;
           playButton.disabled = false;
-          playButton.textContent = ctrl.playing ? "一時停止" : "再生";
+          playButton.textContent = ctrl.playing ? "停止" : "再生";
           timeSpan.textContent = ctrl.totalSeconds > 0
             ? `${formatTime(ctrl.elapsed)} / ${formatTime(ctrl.totalSeconds)}`
             : "";
         } else {
           const isPlaying = !video.paused && !video.ended;
           playButton.disabled = false;
-          playButton.textContent = isPlaying ? "一時停止" : "再生";
+          playButton.textContent = isPlaying ? "停止" : "再生";
           const total = isFinite(video.duration) ? video.duration : 0;
           timeSpan.textContent = total > 0
             ? `${formatTime(video.currentTime)} / ${formatTime(total)}`
@@ -1077,35 +1082,22 @@
 
     function createPreviewController(video, frame, previewWrap, previewUrl, durationSeconds = 0, endedCallback = null) {
       let endTimerId = 0;
-      let endTimerRemainingMs = durationSeconds > 0 ? Math.ceil((durationSeconds + 1) * 1000) : 0;
-      let endTimerStartedAt = 0;
       let tickerId = 0;
       let elapsedSeconds = 0;
-      let started = false;
-
-      // Overlay covers the iframe while paused so video keeps playing in background
-      const overlay = document.createElement("div");
-      overlay.className = "preview-pause-overlay";
-      previewWrap.appendChild(overlay);
 
       function startEndTimer() {
-        if (endTimerRemainingMs <= 0) return;
-        endTimerStartedAt = Date.now();
+        if (durationSeconds <= 0) return;
         endTimerId = window.setTimeout(() => {
           endTimerId = 0;
           controller.playing = false;
           stopTicker();
           video.dispatchEvent(new Event("previewstatechange"));
           if (typeof endedCallback === "function") endedCallback();
-        }, endTimerRemainingMs);
+        }, Math.ceil((durationSeconds + 1) * 1000));
       }
 
-      function pauseEndTimer() {
-        if (!endTimerId) return;
-        window.clearTimeout(endTimerId);
-        endTimerId = 0;
-        endTimerRemainingMs -= Date.now() - endTimerStartedAt;
-        endTimerStartedAt = 0;
+      function clearEndTimer() {
+        if (endTimerId) { window.clearTimeout(endTimerId); endTimerId = 0; }
       }
 
       function startTicker() {
@@ -1118,10 +1110,7 @@
       }
 
       function stopTicker() {
-        if (tickerId) {
-          window.clearInterval(tickerId);
-          tickerId = 0;
-        }
+        if (tickerId) { window.clearInterval(tickerId); tickerId = 0; }
       }
 
       const controller = {
@@ -1130,35 +1119,36 @@
         totalSeconds: durationSeconds,
         toggle() {
           if (controller.playing) {
-            controller.pause();
+            controller.stop();
           } else {
             controller.play();
           }
         },
         play() {
-          if (!started) {
-            started = true;
-            frame.src = withAutoplay(previewUrl);
-          }
-          overlay.style.display = "none";
+          // Each play reloads from beginning (Drive iframes cannot seek)
+          elapsedSeconds = 0;
+          controller.elapsed = 0;
+          clearEndTimer();
+          stopTicker();
+          frame.src = withAutoplay(previewUrl);
           controller.playing = true;
           startEndTimer();
           startTicker();
           video.dispatchEvent(new Event("previewstatechange"));
         },
-        pause() {
-          pauseEndTimer();
+        stop() {
+          clearEndTimer();
           stopTicker();
           controller.playing = false;
-          // Show overlay to visually pause without reloading the iframe
-          overlay.style.display = "block";
+          elapsedSeconds = 0;
+          controller.elapsed = 0;
+          frame.src = "";  // unloads iframe — video actually stops
           video.dispatchEvent(new Event("previewstatechange"));
         },
         destroy() {
-          pauseEndTimer();
+          clearEndTimer();
           stopTicker();
           controller.playing = false;
-          overlay.remove();
           frame.removeAttribute("src");
           video.dispatchEvent(new Event("previewstatechange"));
         }
