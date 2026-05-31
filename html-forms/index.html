@@ -172,7 +172,6 @@
     }
 
     video,
-    .video-preview,
     img.placement {
       display: block;
       width: 100%;
@@ -182,8 +181,59 @@
       border: 1px solid var(--line);
     }
 
-    .video-preview {
+    video {
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .media-wrap {
+      display: block;
+      width: 100%;
+    }
+
+    .locked-preview {
+      position: relative;
+      display: block;
+      width: 100%;
+      max-width: 100%;
       aspect-ratio: 16 / 9;
+      min-height: 320px;
+      overflow: hidden;
+      background: #111;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    .locked-preview iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      pointer-events: none;
+    }
+
+    .locked-preview-cover {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 82px;
+      background: #050505;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .media-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    .media-controls button {
+      min-height: 38px;
+      padding: 8px 14px;
     }
 
     input[readonly] {
@@ -203,9 +253,25 @@
 
     .question:first-child { border-top: 0; }
 
+    .question-block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 24px 0;
+      background: #fbfbfa;
+    }
+
+    .question-block > h3 {
+      margin-bottom: 6px;
+    }
+
+    .question-block-note {
+      margin: 0 0 12px;
+    }
+
     .scale {
       display: grid;
-      grid-template-columns: minmax(120px, 1fr) repeat(5, 48px) minmax(120px, 1fr);
+      grid-template-columns: minmax(120px, max-content) repeat(5, 48px) minmax(120px, 1fr);
       gap: 8px;
       align-items: center;
       margin-top: 8px;
@@ -330,8 +396,13 @@
       <p>評価いただく動画では、3名のプレイヤーが「ワードウルフ」というゲームを行っています。3人のうち2人には同じお題、1人には少し違うお題が与えられます。会話を通して、誰が少数派のウルフかを推理します。</p>
       <p>あなたの役割は、動画を視聴して誰がウルフだったかを推測し、動画内のロボットやプレイヤーの様子を評価することです。</p>
       <h3>ルール説明動画</h3>
-      <video id="introVideo" controls playsinline preload="metadata"></video>
-      <iframe id="introVideoPreview" class="video-preview hidden" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <div class="media-wrap">
+        <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
+        <div id="introPreviewWrap" class="locked-preview hidden">
+          <iframe id="introVideoPreview" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
+        </div>
+      </div>
       <div class="button-row">
         <button id="toPracticeButton" type="button">練習セッションへ進む</button>
       </div>
@@ -340,8 +411,13 @@
     <section id="practiceSection" class="hidden">
       <h2>練習セッション</h2>
       <p>本番の前に、練習用の短い動画で回答の流れを確認してください。この回答は研究分析データには含めませんが、回答記録として保存します。</p>
-      <video id="practiceVideo" controls playsinline preload="metadata"></video>
-      <iframe id="practiceVideoPreview" class="video-preview hidden" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <div class="media-wrap">
+        <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
+        <div id="practicePreviewWrap" class="locked-preview hidden">
+          <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
+        </div>
+      </div>
       <h3>プレイヤーA/B/Cの配置</h3>
       <img id="practicePlacementImage" class="placement" src="" alt="練習セッションのプレイヤー配置">
 
@@ -355,22 +431,36 @@
           </div>
         </fieldset>
         <div class="button-row">
-          <button type="submit">本番へ進む</button>
+          <button type="submit">回答して正解を見る</button>
           <span id="form1Status" class="muted small"></span>
         </div>
       </form>
+    </section>
+
+    <section id="practiceAnswerSection" class="hidden">
+      <h2>練習セッション：正解発表</h2>
+      <p id="practiceAnswerText" class="status"></p>
+      <div class="button-row">
+        <button id="startExperimentButton" type="button">本番へ進む</button>
+      </div>
     </section>
 
     <section id="experimentSection" class="hidden">
       <div class="progress" id="videoProgress"></div>
       <h2 id="videoTitle"></h2>
       <p>動画を最後まで視聴すると、下のアンケートが回答できるようになります。</p>
-      <video id="studyVideo" controls playsinline preload="metadata"></video>
+      <div class="media-wrap">
+        <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
+        <div id="studyPreviewWrap" class="locked-preview hidden">
+          <iframe id="studyVideoPreview" title="評価対象動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div class="locked-preview-cover" aria-hidden="true"></div>
+        </div>
+      </div>
       <div id="seekNotice" class="status hidden">動画の早送りはできません。視聴済みの位置に戻しました。</div>
       <h3>プレイヤーA/B/Cの配置</h3>
       <img id="placementImage" class="placement" src="" alt="プレイヤー配置">
 
-      <div id="lockedNotice" class="status">動画を最後まで視聴してください。視聴完了後にアンケートが表示されます。</div>
+      <div id="lockedNotice" class="status">動画を最後まで視聴してください。最後まで再生されるとアンケートが表示されます。</div>
 
       <form id="videoForm" class="hidden">
         <div id="questionMount"></div>
@@ -401,10 +491,13 @@
     "use strict";
 
     const CONFIG = {
-      // Paste the private Google Apps Script Web App URL here.
-      gasWebAppUrl: "https://script.google.com/macros/s/AKfycbzue86sKRor3phaAjW3lYC-umkvSG96QoJt28CPT9H6H6jdaMo912jficIgHgFAuzbIKw/exec",
-      localVideoFallback: true
+      gasWebAppUrl: "https://script.google.com/macros/s/AKfycbxJWlwkX0zy9BP0XpSI3DLROzKBCGIqa1ZDfflzDtw4w0wA1QIL32XG9SWM1YE62hhFNw/exec",
+      maxSubmitAttempts: 3
     };
+
+    const INTRO_VIDEO_SECONDS = 93.1;
+    const PRACTICE_VIDEO_SECONDS = 190.1;
+    const STUDY_VIDEO_SECONDS = 185.1;
 
     const ROBOT_ITEMS = [
       ["q03", "偽物のような", "自然な"],
@@ -460,15 +553,20 @@
     const state = {
       workerId: "",
       evalSetId: "",
-      pageEnteredAt: new Date().toISOString(),
+      enterAt: new Date().toISOString(),
       participant: null,
       practiceAnswer: "",
       videos: [],
       currentIndex: 0,
       currentVideo: null,
       completionCode: "",
-      playback: null,
-      submittedVideos: []
+      videoGuard: null,
+      submittedVideos: [],
+      form1Submitted: false,
+      currentPageNumber: 0,
+      currentPageStartedAt: 0,
+      nextPageNumber: 1,
+      pageTimes: Array(12).fill(0)
     };
 
     const $ = (id) => document.getElementById(id);
@@ -502,9 +600,11 @@
           video.imageName = `${video.stem}.jpg`;
         });
 
-        setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introVideoPreview"));
-        setVideoSource($("practiceVideo"), "practice-session.mp4", $("practiceVideoPreview"));
-        setImageSource($("practicePlacementImage"), "practice-session.jpg");
+        await Promise.all([
+          setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS),
+          setVideoSource($("practiceVideo"), "practice-session.mp4", $("practicePreviewWrap"), $("practiceVideoPreview"), PRACTICE_VIDEO_SECONDS),
+          setImageSource($("practicePlacementImage"), "practice-session.jpg")
+        ]);
         bindEvents();
         showOnly("introSection");
       } catch (error) {
@@ -517,6 +617,7 @@
       $("participantForm").addEventListener("submit", onParticipantSubmit);
       $("toPracticeButton").addEventListener("click", () => showOnly("practiceSection"));
       $("practiceForm").addEventListener("submit", onPracticeSubmit);
+      $("startExperimentButton").addEventListener("click", startExperiment);
       $("videoForm").addEventListener("submit", onVideoSubmit);
       $("nextVideoButton").addEventListener("click", onNextVideo);
     }
@@ -540,44 +641,27 @@
     async function onPracticeSubmit(event) {
       event.preventDefault();
       state.practiceAnswer = new FormData(event.currentTarget).get("practiceWolf");
-      $("form1Status").textContent = "送信中...";
-      try {
-        await submitPayload({
-          recordType: "form1",
-          workerId: state.workerId,
-          evalSetId: state.evalSetId,
-          pageEnteredAt: state.pageEnteredAt,
-          submittedAt: new Date().toISOString(),
-          participant: state.participant,
-          practice: {
-            answer: state.practiceAnswer,
-            correctAnswer: "A"
-          }
-        });
-        $("form1Status").textContent = "保存しました。";
-        state.currentIndex = 0;
-        showVideo();
-      } catch (error) {
-        console.error(error);
-        $("form1Status").textContent = "送信に失敗しました。通信状況を確認して再度お試しください。";
-      }
+      $("form1Status").textContent = "";
+      $("practiceAnswerText").innerHTML = renderAnswerFeedback(state.practiceAnswer, "A");
+      showOnly("practiceAnswerSection");
     }
 
-    function showVideo() {
+    async function startExperiment() {
+      state.currentIndex = 0;
+      await showVideo();
+    }
+
+    async function showVideo() {
       const video = state.videos[state.currentIndex];
       state.currentVideo = video;
-      state.playback = {
-        startedAt: new Date().toISOString(),
-        endedAt: "",
+      state.videoGuard = {
         maxWatchedSeconds: 0,
-        durationSeconds: 0,
-        seekAttempts: 0,
         completed: false
       };
 
       $("videoProgress").textContent = `${state.currentIndex + 1} / ${state.videos.length} 本目`;
       $("videoTitle").textContent = `${state.currentIndex + 1}本目の評価`;
-      setImageSource($("placementImage"), video.imageName);
+      await setImageSource($("placementImage"), video.imageName);
       $("placementImage").alt = `${video.stem} のプレイヤー配置`;
       $("lockedNotice").classList.remove("hidden");
       $("videoForm").classList.add("hidden");
@@ -586,37 +670,101 @@
       renderQuestionnaire();
 
       const studyVideo = $("studyVideo");
-      studyVideo.pause();
-      setVideoSource(studyVideo, video.fileName);
+      clearVideoSource(studyVideo);
       installVideoGuard(studyVideo);
+      await setVideoSource(studyVideo, video.fileName, $("studyPreviewWrap"), $("studyVideoPreview"), STUDY_VIDEO_SECONDS, unlockQuestionnaire);
       showOnly("experimentSection");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function installVideoGuard(video) {
-      video.onloadedmetadata = () => {
-        state.playback.durationSeconds = Number.isFinite(video.duration) ? Math.round(video.duration) : 0;
+      applyVideoRestrictions(video);
+      video.onratechange = () => {
+        if (video.playbackRate !== 1) {
+          video.playbackRate = 1;
+        }
       };
       video.ontimeupdate = () => {
-        if (!video.seeking) {
-          state.playback.maxWatchedSeconds = Math.max(state.playback.maxWatchedSeconds, video.currentTime);
+        if (!video.seeking && state.videoGuard) {
+          state.videoGuard.maxWatchedSeconds = Math.max(state.videoGuard.maxWatchedSeconds, video.currentTime);
         }
       };
       video.onseeking = () => {
-        const allowed = state.playback.maxWatchedSeconds + 0.75;
-        if (!state.playback.completed && video.currentTime > allowed) {
-          state.playback.seekAttempts += 1;
-          video.currentTime = state.playback.maxWatchedSeconds;
+        if (!state.videoGuard) return;
+        const allowed = state.videoGuard.maxWatchedSeconds + 0.75;
+        if (!state.videoGuard.completed && video.currentTime > allowed) {
+          video.currentTime = state.videoGuard.maxWatchedSeconds;
           flashSeekNotice();
         }
       };
       video.onended = () => {
-        state.playback.completed = true;
-        state.playback.endedAt = new Date().toISOString();
-        state.playback.maxWatchedSeconds = Math.max(state.playback.maxWatchedSeconds, video.duration || 0);
-        $("lockedNotice").classList.add("hidden");
-        $("videoForm").classList.remove("hidden");
+        unlockQuestionnaire();
       };
+    }
+
+    function unlockQuestionnaire() {
+      if (!state.videoGuard) return;
+      state.videoGuard.completed = true;
+      $("lockedNotice").classList.add("hidden");
+      $("videoForm").classList.remove("hidden");
+    }
+
+    function applyVideoRestrictions(video) {
+      if (!video) return;
+      video.controls = false;
+      video.removeAttribute("controls");
+      if (video.controlsList && typeof video.controlsList.add === "function") {
+        video.controlsList.add("nodownload", "noplaybackrate", "noremoteplayback");
+      }
+      video.disablePictureInPicture = true;
+      video.disableRemotePlayback = true;
+      video.setAttribute("disableremoteplayback", "");
+      video.setAttribute("tabindex", "-1");
+      video.oncontextmenu = (event) => event.preventDefault();
+      video.playbackRate = 1;
+      video.defaultPlaybackRate = 1;
+      installCustomVideoControls(video);
+    }
+
+    function installCustomVideoControls(video) {
+      if (video.dataset.customControls === "true") return;
+      video.dataset.customControls = "true";
+
+      const controls = document.createElement("div");
+      controls.className = "media-controls";
+      controls.innerHTML = `<button type="button" class="media-play">再生</button>`;
+
+      // Insert controls after the media-wrap container (below the video/iframe)
+      const wrap = video.closest(".media-wrap");
+      const insertTarget = wrap || video;
+      insertTarget.insertAdjacentElement("afterend", controls);
+
+      const playButton = controls.querySelector(".media-play");
+      playButton.addEventListener("click", async () => {
+        if (video._previewController) {
+          video._previewController.toggle();
+          return;
+        }
+        if (video.paused || video.ended) {
+          try {
+            await video.play();
+          } catch (error) {
+            console.error("Video playback was blocked:", error);
+          }
+        } else {
+          video.pause();
+        }
+      });
+
+      const syncControls = () => {
+        const isPlaying = video._previewController ? video._previewController.playing : (!video.paused && !video.ended);
+        playButton.disabled = false;
+        playButton.textContent = isPlaying ? "一時停止" : "再生";
+      };
+      ["loadstart", "loadedmetadata", "timeupdate", "play", "pause", "ended", "durationchange", "previewstatechange"].forEach((eventName) => {
+        video.addEventListener(eventName, syncControls);
+      });
+      syncControls();
     }
 
     function flashSeekNotice() {
@@ -628,26 +776,33 @@
     function renderQuestionnaire() {
       const mount = $("questionMount");
       mount.textContent = "";
-      mount.appendChild(renderWolfGuess());
-      mount.appendChild(renderReason());
-      mount.appendChild(renderSectionTitle("ロボットの印象評価", "左の形容詞から右の形容詞への5段階で評価してください。"));
-      shuffle(ROBOT_ITEMS).forEach((item) => mount.appendChild(renderBipolarScale(item[0], item[1], item[2])));
-      mount.appendChild(renderSectionTitle("第三者視点から見るプレイヤーのゲーム体験", "動画内のプレイヤーがどのように見えたかを評価してください。"));
-      shuffle(PLAYER_ITEMS).forEach((item) => mount.appendChild(renderAgreementScale(item[0], item[1])));
-      mount.appendChild(renderAgreementScale("q48", "動画に基づいて、プレイヤーはロボットとのインタラクションをどの程度楽しんでいたように見えましたか？", "まったく楽しんでいなかったように見えた", "とても楽しんでいたように見えた"));
+      mount.appendChild(renderQuestionBlock("ウルフ推測", "", [
+        renderWolfGuess(),
+        renderReason()
+      ]));
+      mount.appendChild(renderQuestionBlock("ロボットの印象評価", "ロボットについて、あなたの率直な印象をお伺いします。", (
+        shuffle(ROBOT_ITEMS).map((item) => renderBipolarScale(item[0], item[1], item[2]))
+      )));
+      mount.appendChild(renderQuestionBlock("第三者視点から見るプレイヤーのゲーム体験", "あなたは、第三者評価者として、自分自身の体験ではなく、動画内のプレイヤーがどのように見えたかを評価します。", (
+        shuffle(PLAYER_ITEMS).map((item) => renderAgreementScale(item[0], item[1]))
+      )));
+      mount.appendChild(renderQuestionBlock("ロボットとのインタラクションの楽しさ", "", [
+        renderAgreementScale("q48", "動画に基づいて、プレイヤーはロボットとのインタラクションをどの程度楽しんでいたように見えましたか？", "まったく楽しんでいなかったように見えた", "とても楽しんでいたように見えた")
+      ]));
     }
 
-    function renderSectionTitle(title, note) {
+    function renderQuestionBlock(title, note, children) {
       const div = document.createElement("div");
-      div.className = "question";
-      div.innerHTML = `<h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(note)}</p>`;
+      div.className = "question-block";
+      div.innerHTML = `<h3>${escapeHtml(title)}</h3>${note ? `<p class="muted question-block-note">${escapeHtml(note)}</p>` : ""}`;
+      children.forEach((child) => div.appendChild(child));
       return div;
     }
 
     function renderWolfGuess() {
       const fieldset = document.createElement("fieldset");
       fieldset.innerHTML = `
-        <legend>Q1. このゲームでは、誰がウルフだったと思いますか？</legend>
+        <legend>このゲームでは、誰がウルフだったと思いますか？</legend>
         <div class="choice-row">
           <label><input type="radio" name="q01" value="A" required> A</label>
           <label><input type="radio" name="q01" value="B" required> B</label>
@@ -660,7 +815,7 @@
       const div = document.createElement("div");
       div.className = "question";
       div.innerHTML = `
-        <label for="q02">Q2. そのように考えた理由を簡単に記入してください 任意</label>
+        <label for="q02">そのように考えた理由を簡単に記入してください 任意</label>
         <textarea id="q02" name="q02"></textarea>`;
       return div;
     }
@@ -668,7 +823,7 @@
     function renderBipolarScale(name, left, right) {
       const div = document.createElement("div");
       div.className = "question";
-      div.innerHTML = `<div><strong>${name.toUpperCase()}.</strong></div><div class="scale" role="radiogroup" aria-label="${escapeHtml(left)} - ${escapeHtml(right)}">
+      div.innerHTML = `<div class="scale" role="radiogroup" aria-label="${escapeHtml(left)} - ${escapeHtml(right)}">
         <div>${escapeHtml(left)}</div>
         ${[1, 2, 3, 4, 5].map((value) => `<label class="point"><input type="radio" name="${name}" value="${value}" required> ${value}</label>`).join("")}
         <div>${escapeHtml(right)}</div>
@@ -676,10 +831,10 @@
       return div;
     }
 
-    function renderAgreementScale(name, text, low = "1", high = "5") {
+    function renderAgreementScale(name, text, low = "全く当てはまらない", high = "非常に当てはまる") {
       const div = document.createElement("div");
       div.className = "question";
-      div.innerHTML = `<div><strong>${name.toUpperCase()}.</strong> ${escapeHtml(text)}</div><div class="scale" role="radiogroup" aria-label="${escapeHtml(text)}">
+      div.innerHTML = `<div>${escapeHtml(text)}</div><div class="scale" role="radiogroup" aria-label="${escapeHtml(text)}">
         <div>${escapeHtml(low)}</div>
         ${[1, 2, 3, 4, 5].map((value) => `<label class="point"><input type="radio" name="${name}" value="${value}" required> ${value}</label>`).join("")}
         <div>${escapeHtml(high)}</div>
@@ -702,7 +857,6 @@
           recordType: "form2",
           workerId: state.workerId,
           evalSetId: state.evalSetId,
-          submittedAt: new Date().toISOString(),
           video: {
             groupId: video.group_id,
             view: video.view,
@@ -711,15 +865,16 @@
             stem: video.stem,
             fileName: video.fileName
           },
-          responses,
-          playback: normalizedPlayback()
+          responses
         });
 
-        state.submittedVideos.push(video.video_code);
+        if (!state.submittedVideos.includes(video.video_code)) {
+          state.submittedVideos.push(video.video_code);
+        }
         if (result.completionCode) {
           state.completionCode = result.completionCode;
         }
-        $("answerText").textContent = `このゲームの正解 ウルフ は「${result.correctWolf}」でした。`;
+        $("answerText").innerHTML = renderAnswerFeedback(responses.wolf, result.correctWolf);
         $("nextVideoButton").textContent = state.currentIndex + 1 >= state.videos.length ? "完了画面へ進む" : "次の動画へ進む";
         showOnly("answerSection");
       } catch (error) {
@@ -730,43 +885,98 @@
       }
     }
 
-    function collectResponses(formData) {
-      const responses = {
-        q01: formData.get("q01"),
-        q02: String(formData.get("q02") || "").trim()
-      };
-      for (let n = 3; n <= 48; n += 1) {
-        const key = `q${String(n).padStart(2, "0")}`;
-        responses[key] = formData.get(key);
-      }
-      return responses;
+    function renderAnswerFeedback(selectedWolf, correctWolf) {
+      const selected = selectedWolf || "未回答";
+      const correct = correctWolf || "不明";
+      const isCorrect = selected === correct;
+      const message = isCorrect
+        ? "正解です。おめでとうございます！"
+        : "残念、今回は不正解でした。次の動画でまた挑戦してください。";
+      return [
+        `あなたの回答は「${escapeHtml(selected)}」でした。`,
+        `このゲームの正解 ウルフ は「${escapeHtml(correct)}」でした。`,
+        `<strong>${escapeHtml(message)}</strong>`
+      ].join("<br>");
     }
 
-    function normalizedPlayback() {
-      return {
-        ...state.playback,
-        maxWatchedSeconds: Math.round(state.playback.maxWatchedSeconds),
-        durationSeconds: Math.round(state.playback.durationSeconds || 0)
+    function collectResponses(formData) {
+      const responses = {
+        wolf: formData.get("q01"),
+        wolf_memo: String(formData.get("q02") || "").trim()
       };
+      for (let n = 3; n <= 25; n += 1) {
+        responses[`gqs${n - 2}`] = formData.get(`q${String(n).padStart(2, "0")}`);
+      }
+      for (let n = 26; n <= 47; n += 1) {
+        responses[`geq${n - 25}`] = formData.get(`q${String(n).padStart(2, "0")}`);
+      }
+      responses["hri-cues"] = formData.get("q48");
+      return responses;
     }
 
     async function onNextVideo() {
       state.currentIndex += 1;
       if (state.currentIndex >= state.videos.length) {
-        $("completionCode").textContent = state.completionCode || "完了コードを取得できませんでした。研究担当者に連絡してください。";
-        showOnly("completeSection");
+        const nextButton = $("nextVideoButton");
+        nextButton.disabled = true;
+        nextButton.textContent = "完了情報を保存中...";
+        try {
+          await submitForm1AtEnd();
+          $("completionCode").textContent = state.completionCode || "完了コードを取得できませんでした。研究担当者に連絡してください。";
+          showOnly("completeSection");
+        } catch (error) {
+          console.error(error);
+          $("answerText").innerHTML += "<br><strong>完了情報の保存に失敗しました。通信状況を確認して再度お試しください。</strong>";
+          nextButton.disabled = false;
+          nextButton.textContent = "完了画面へ進む";
+        }
       } else {
-        showVideo();
+        await showVideo();
       }
     }
 
-    async function submitPayload(payload) {
-      if (!CONFIG.gasWebAppUrl) {
-        console.info("GAS endpoint is blank. Simulated submission:", payload);
-        await new Promise((resolve) => window.setTimeout(resolve, 250));
-        return { ok: true, simulated: true };
-      }
+    async function submitForm1AtEnd() {
+      if (state.form1Submitted) return;
+      recordCurrentPageTime();
+      stopPageTimer();
+      await submitPayload({
+        recordType: "form1",
+        workerId: state.workerId,
+        evalSetId: state.evalSetId,
+        enterAt: state.enterAt,
+        submitAt: new Date().toISOString(),
+        participant: state.participant,
+        practice: {
+          answer: state.practiceAnswer,
+          correctAnswer: "A"
+        },
+        videos: state.videos,
+        pageTimes: state.pageTimes
+      });
+      state.form1Submitted = true;
+    }
 
+    async function submitPayload(payload) {
+      return await submitPayloadWithRetry(payload);
+    }
+
+    async function submitPayloadWithRetry(payload) {
+      let lastError = null;
+      for (let attempt = 1; attempt <= CONFIG.maxSubmitAttempts; attempt += 1) {
+        try {
+          return await submitPayloadOnce(payload);
+        } catch (error) {
+          lastError = error;
+          console.warn(`Submission attempt ${attempt} failed:`, error);
+          if (attempt < CONFIG.maxSubmitAttempts) {
+            await new Promise((resolve) => window.setTimeout(resolve, 600 * attempt));
+          }
+        }
+      }
+      throw lastError;
+    }
+
+    async function submitPayloadOnce(payload) {
       const response = await fetch(CONFIG.gasWebAppUrl, {
         method: "POST",
         mode: "cors",
@@ -782,50 +992,136 @@
       return data;
     }
 
-    async function setVideoSource(video, fileName, previewFrame = null) {
-      video.removeAttribute("src");
+    async function setVideoSource(video, fileName, previewWrap = null, previewFrame = null, durationSeconds = 0, previewEnded = null) {
+      clearVideoSource(video);
+      applyVideoRestrictions(video);
       video.classList.remove("hidden");
-      if (previewFrame) {
-        previewFrame.removeAttribute("src");
-        previewFrame.classList.add("hidden");
-      }
+      setCustomControlsVisible(video, true);
+      resetLockedPreview(video, previewWrap, previewFrame);
       video.load();
-      const sourceUrl = await resolveMediaUrl("videoUrl", fileName, "videos");
+      const sourceUrl = await resolveMediaUrl("videoUrl", fileName);
       const previewUrl = drivePreviewUrl(sourceUrl);
-      if (previewFrame && previewUrl) {
-        previewFrame.src = previewUrl;
-        previewFrame.classList.remove("hidden");
-        video.classList.add("hidden");
+      if (previewWrap && previewFrame && previewUrl) {
+        showLockedPreview(video, previewWrap, previewFrame, previewUrl, durationSeconds, previewEnded);
         return;
       }
-      video.onerror = () => {
-        if (previewFrame && previewUrl) {
-          previewFrame.src = previewUrl;
-          previewFrame.classList.remove("hidden");
-          video.classList.add("hidden");
-        }
-      };
+      video.onerror = () => console.error(`Video failed to load: ${fileName}`);
       video.src = sourceUrl;
       video.load();
     }
 
-    async function setImageSource(image, fileName) {
-      image.removeAttribute("src");
-      image.src = await resolveMediaUrl("imageUrl", fileName, "images");
+    function showLockedPreview(video, previewWrap, previewFrame, previewUrl, durationSeconds = 0, previewEnded = null) {
+      clearVideoSource(video);
+      video.classList.add("hidden");
+      setCustomControlsVisible(video, true);
+      previewWrap.classList.remove("hidden");
+      previewFrame.dataset.previewUrl = previewUrl;
+      previewFrame.src = previewUrl;
+      video._previewController = createPreviewController(video, previewFrame, previewUrl, durationSeconds, previewEnded);
+      video.dispatchEvent(new Event("previewstatechange"));
     }
 
-    async function resolveMediaUrl(action, fileName, fallbackDir) {
-      if (CONFIG.gasWebAppUrl) {
-        const result = await fetchJson(`${CONFIG.gasWebAppUrl}?action=${action}&name=${encodeURIComponent(fileName)}`);
-        if (!result.url) throw new Error(`Media URL lookup failed: ${fileName}`);
-        return result.url;
+    function resetLockedPreview(video, previewWrap, previewFrame) {
+      if (video && video._previewController) {
+        video._previewController.destroy();
+        video._previewController = null;
+        video.dispatchEvent(new Event("previewstatechange"));
       }
-      return CONFIG.localVideoFallback ? `${fallbackDir}/${encodeURIComponent(fileName)}` : "";
+      if (!previewWrap || !previewFrame) return;
+      previewFrame.removeAttribute("src");
+      previewFrame.removeAttribute("data-preview-url");
+      previewWrap.classList.add("hidden");
+    }
+
+    function createPreviewController(video, frame, previewUrl, durationSeconds = 0, endedCallback = null) {
+      let timerId = 0;
+      const controller = {
+        playing: false,
+        toggle() {
+          if (controller.playing) {
+            controller.pause();
+          } else {
+            controller.play();
+          }
+        },
+        play() {
+          controller.pause();
+          controller.playing = true;
+          frame.src = withAutoplay(previewUrl);
+          if (durationSeconds > 0) {
+            timerId = window.setTimeout(() => {
+              controller.playing = false;
+              timerId = 0;
+              video.dispatchEvent(new Event("previewstatechange"));
+              if (typeof endedCallback === "function") {
+                endedCallback();
+              }
+            }, Math.ceil((durationSeconds + 1) * 1000));
+          }
+          video.dispatchEvent(new Event("previewstatechange"));
+        },
+        pause() {
+          if (timerId) {
+            window.clearTimeout(timerId);
+            timerId = 0;
+          }
+          controller.playing = false;
+          frame.src = previewUrl;
+          video.dispatchEvent(new Event("previewstatechange"));
+        },
+        destroy() {
+          if (timerId) {
+            window.clearTimeout(timerId);
+            timerId = 0;
+          }
+          controller.playing = false;
+          frame.removeAttribute("src");
+          video.dispatchEvent(new Event("previewstatechange"));
+        }
+      };
+      return controller;
+    }
+
+    async function setImageSource(image, fileName) {
+      image.removeAttribute("src");
+      image.alt = image.alt || fileName;
+      const sourceUrl = await resolveMediaUrl("imageUrl", fileName);
+      image.src = driveImageUrl(sourceUrl);
+    }
+
+    async function resolveMediaUrl(action, fileName) {
+      const result = await fetchJson(`${CONFIG.gasWebAppUrl}?action=${action}&name=${encodeURIComponent(fileName)}`);
+      if (result.url) return result.url;
+      throw new Error(`No URL returned for ${fileName}`);
+    }
+
+    function setCustomControlsVisible(video, visible) {
+      const wrap = video.closest(".media-wrap");
+      const controls = wrap ? wrap.nextElementSibling : video.nextElementSibling;
+      if (controls && controls.classList.contains("media-controls")) {
+        controls.classList.toggle("hidden", !visible);
+      }
+    }
+
+    function driveFileId(url) {
+      const queryMatch = /[?&]id=([^&]+)/.exec(url);
+      if (queryMatch) return decodeURIComponent(queryMatch[1]);
+      const pathMatch = /\/file\/d\/([^/]+)/.exec(url);
+      return pathMatch ? decodeURIComponent(pathMatch[1]) : "";
     }
 
     function drivePreviewUrl(url) {
-      const match = /[?&]id=([^&]+)/.exec(url);
-      return match ? `https://drive.google.com/file/d/${decodeURIComponent(match[1])}/preview` : "";
+      const id = driveFileId(url);
+      return id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : "";
+    }
+
+    function withAutoplay(url) {
+      return url.includes("?") ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+    }
+
+    function driveImageUrl(url) {
+      const id = driveFileId(url);
+      return id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1600` : url;
     }
 
     async function fetchJson(url) {
@@ -838,16 +1134,65 @@
     }
 
     async function loadManifest(workerId) {
-      if (!CONFIG.gasWebAppUrl) {
-        throw new Error("GAS endpoint is required for worker manifest lookup.");
-      }
-      return fetchJson(`${CONFIG.gasWebAppUrl}?action=workerManifest&workerId=${encodeURIComponent(workerId)}`);
+      return await fetchJson(`${CONFIG.gasWebAppUrl}?action=workerManifest&workerId=${encodeURIComponent(workerId)}`);
     }
 
     function showOnly(sectionId) {
-      ["fatalSection", "introSection", "rulesSection", "practiceSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      recordCurrentPageTime();
+      stopAllMedia(sectionId);
+      ["fatalSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
+      startPageTimer(sectionId);
+    }
+
+    function startPageTimer(sectionId) {
+      if (sectionId === "fatalSection" || state.nextPageNumber > state.pageTimes.length) return;
+      state.currentPageNumber = state.nextPageNumber;
+      state.nextPageNumber += 1;
+      state.currentPageStartedAt = Date.now();
+    }
+
+    function recordCurrentPageTime() {
+      if (!state.currentPageNumber || !state.currentPageStartedAt) return;
+      const index = state.currentPageNumber - 1;
+      if (index >= 0 && index < state.pageTimes.length) {
+        state.pageTimes[index] += Math.round((Date.now() - state.currentPageStartedAt) / 1000);
+      }
+      state.currentPageStartedAt = Date.now();
+    }
+
+    function stopPageTimer() {
+      state.currentPageNumber = 0;
+      state.currentPageStartedAt = 0;
+      state.nextPageNumber = state.pageTimes.length + 1;
+    }
+
+    function stopAllMedia(activeSectionId) {
+      document.querySelectorAll("video").forEach(pauseMedia);
+      document.querySelectorAll(".locked-preview iframe").forEach((frame) => {
+        const section = frame.closest("section");
+        const isVisible = section && !section.classList.contains("hidden");
+        if (frame.src && isVisible && section.id !== activeSectionId) {
+          frame.src = "";
+        }
+      });
+    }
+
+    function pauseMedia(video) {
+      if (!video) return;
+      if (video._previewController) {
+        video._previewController.pause();
+        return;
+      }
+      video.pause();
+    }
+
+    function clearVideoSource(video) {
+      if (!video) return;
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
     }
 
     function showFatal(message) {
