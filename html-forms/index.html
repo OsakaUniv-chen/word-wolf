@@ -943,6 +943,14 @@
       applyVideoRestrictions(video);
       const sourceUrl = await resolveMediaUrl("videoUrl", fileName);
       video.src = driveDirectUrl(sourceUrl);
+      video.onerror = () => {
+        console.error("Video load error", video.error, "src:", video.src);
+        const controls = video.nextElementSibling;
+        if (controls && controls.classList.contains("media-controls")) {
+          controls.insertAdjacentHTML("beforeend",
+            `<span class="error small">動画の読み込みに失敗しました。管理者に連絡してください。</span>`);
+        }
+      };
       video.load();
     }
 
@@ -968,7 +976,8 @@
 
     function driveDirectUrl(url) {
       const id = driveFileId(url);
-      return id ? `https://drive.google.com/uc?export=download&id=${encodeURIComponent(id)}&confirm=t` : url;
+      // export=open serves the file inline (no virus-scan confirmation redirect)
+      return id ? `https://drive.google.com/uc?export=open&id=${encodeURIComponent(id)}` : url;
     }
 
     function driveImageUrl(url) {
@@ -977,11 +986,15 @@
     }
 
     async function fetchJson(url) {
+      // Cache-bust via URL timestamp instead of cache:"no-store" header,
+      // because Cache-Control request headers trigger CORS preflight which
+      // GAS does not respond to — this breaks Safari.
+      const bustUrl = url + (url.includes("?") ? "&" : "?") + "_t=" + Date.now();
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 10000);
       let response;
       try {
-        response = await fetch(url, { cache: "no-store", signal: controller.signal });
+        response = await fetch(bustUrl, { signal: controller.signal });
       } finally {
         window.clearTimeout(timeoutId);
       }
