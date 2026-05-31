@@ -207,16 +207,17 @@
     .locked-preview iframe {
       display: block;
       width: 100%;
-      height: 100%;
+      /* Extend iframe beyond container so Drive's control bar overflows and gets clipped */
+      height: calc(100% + 48px);
       border: 0;
       pointer-events: none;
     }
 
-    /* Dark overlay shown while video is paused — keeps iframe loaded at correct position */
+    /* Fully opaque overlay shown while paused — keeps iframe loaded at correct position */
     .preview-pause-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.82);
+      background: #111;
       z-index: 3;
       display: none;
     }
