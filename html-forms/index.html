@@ -219,21 +219,11 @@
     .locked-preview iframe {
       display: block;
       width: 100%;
-      height: 100%;
+      /* Video is 1920×1350 (1080 content + 270 black padding).
+         Show only the top 1080px: 1350/1080 = 125% height clips the rest. */
+      height: 125%;
       border: 0;
       pointer-events: none;
-    }
-
-    /* Dark gradient covers Drive's floating control bar, blending with video content */
-    .locked-preview-cover {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 64px;
-      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.92));
-      pointer-events: auto;
-      z-index: 2;
     }
 
     .media-controls {
@@ -437,7 +427,6 @@
         <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="introPreviewWrap" class="locked-preview hidden">
           <iframe id="introVideoPreview" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div class="button-row">
@@ -452,7 +441,6 @@
         <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="practicePreviewWrap" class="locked-preview hidden">
           <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div class="placement-block">
@@ -492,7 +480,6 @@
         <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="studyPreviewWrap" class="locked-preview hidden">
           <iframe id="studyVideoPreview" title="評価対象動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div id="seekNotice" class="status hidden">動画の早送りはできません。視聴済みの位置に戻しました。</div>
