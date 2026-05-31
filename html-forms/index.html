@@ -368,6 +368,10 @@
   </header>
 
   <main class="wrap">
+    <section id="loadingSection">
+      <p class="muted">読み込み中...</p>
+    </section>
+
     <section id="fatalSection" class="hidden">
       <h2>アクセス情報を確認してください</h2>
       <p id="fatalMessage" class="error"></p>
@@ -1207,8 +1211,19 @@
     }
 
     async function fetchJson(url) {
-      const response = await fetch(url, { cache: "no-store" });
-      const data = await response.json();
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 10000);
+      let response;
+      try {
+        response = await fetch(url, { cache: "no-store", signal: controller.signal });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+      const text = await response.text();
+      let data;
+      try { data = JSON.parse(text); } catch (_) {
+        throw new Error(`サーバーから予期しない応答を受け取りました (HTTP ${response.status})`);
+      }
       if (!response.ok || data.ok === false) {
         throw new Error(data.error || `Request failed: ${response.status}`);
       }
@@ -1222,7 +1237,7 @@
     function showOnly(sectionId) {
       recordCurrentPageTime();
       stopAllMedia(sectionId);
-      ["fatalSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      ["loadingSection", "fatalSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
