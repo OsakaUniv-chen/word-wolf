@@ -1264,7 +1264,7 @@
     function pauseMedia(video) {
       if (!video) return;
       if (video._previewController) {
-        video._previewController.pause();
+        video._previewController.stop();
         return;
       }
       video.pause();
