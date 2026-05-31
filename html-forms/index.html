@@ -212,15 +212,13 @@
       pointer-events: none;
     }
 
-    .locked-preview-cover {
+    /* Dark overlay shown while video is paused — keeps iframe loaded at correct position */
+    .preview-pause-overlay {
       position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 82px;
-      background: #050505;
-      pointer-events: auto;
-      z-index: 2;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 3;
+      display: none;
     }
 
     .media-controls {
@@ -236,6 +234,12 @@
       padding: 8px 14px;
     }
 
+    .media-time {
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
     input[readonly] {
       background: #f1f3f4;
       color: var(--muted);
@@ -243,7 +247,21 @@
 
     img.placement {
       background: #fff;
-      margin-top: 10px;
+      display: block;
+      width: 100%;
+      margin: 0;
+    }
+
+    .placement-block {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 24px;
+      background: #fbfbfa;
+    }
+
+    .placement-block h3 {
+      margin-bottom: 12px;
     }
 
     .question {
@@ -400,7 +418,6 @@
         <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="introPreviewWrap" class="locked-preview hidden">
           <iframe id="introVideoPreview" title="ルール説明動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div class="button-row">
@@ -415,11 +432,12 @@
         <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="practicePreviewWrap" class="locked-preview hidden">
           <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
-      <h3>プレイヤーA/B/Cの配置</h3>
-      <img id="practicePlacementImage" class="placement" src="" alt="練習セッションのプレイヤー配置">
+      <div class="placement-block">
+        <h3>プレイヤーA/B/Cの配置</h3>
+        <img id="practicePlacementImage" class="placement" src="" alt="練習セッションのプレイヤー配置">
+      </div>
 
       <form id="practiceForm">
         <fieldset>
@@ -453,12 +471,14 @@
         <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="studyPreviewWrap" class="locked-preview hidden">
           <iframe id="studyVideoPreview" title="評価対象動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-          <div class="locked-preview-cover" aria-hidden="true"></div>
         </div>
       </div>
       <div id="seekNotice" class="status hidden">動画の早送りはできません。視聴済みの位置に戻しました。</div>
-      <h3>プレイヤーA/B/Cの配置</h3>
-      <img id="placementImage" class="placement" src="" alt="プレイヤー配置">
+
+      <div class="placement-block">
+        <h3>プレイヤーA/B/Cの配置</h3>
+        <img id="placementImage" class="placement" src="" alt="プレイヤー配置">
+      </div>
 
       <div id="lockedNotice" class="status">動画を最後まで視聴してください。最後まで再生されるとアンケートが表示されます。</div>
 
@@ -521,7 +541,7 @@
       ["q21", "知的でない", "知的な"],
       ["q22", "愚かな", "賢明な"],
       ["q23", "不安な", "落ち着いた"],
-      ["q24", "動揺している", "冷静な"],
+      ["q24", "動揑している", "冷静な"],
       ["q25", "平穏な", "驚いた"]
     ];
 
@@ -732,14 +752,15 @@
 
       const controls = document.createElement("div");
       controls.className = "media-controls";
-      controls.innerHTML = `<button type="button" class="media-play">再生</button>`;
+      controls.innerHTML = `<button type="button" class="media-play">再生</button><span class="media-time"></span>`;
 
-      // Insert controls after the media-wrap container (below the video/iframe)
       const wrap = video.closest(".media-wrap");
       const insertTarget = wrap || video;
       insertTarget.insertAdjacentElement("afterend", controls);
 
       const playButton = controls.querySelector(".media-play");
+      const timeSpan = controls.querySelector(".media-time");
+
       playButton.addEventListener("click", async () => {
         if (video._previewController) {
           video._previewController.toggle();
@@ -757,14 +778,34 @@
       });
 
       const syncControls = () => {
-        const isPlaying = video._previewController ? video._previewController.playing : (!video.paused && !video.ended);
-        playButton.disabled = false;
-        playButton.textContent = isPlaying ? "一時停止" : "再生";
+        if (video._previewController) {
+          const ctrl = video._previewController;
+          playButton.disabled = false;
+          playButton.textContent = ctrl.playing ? "一時停止" : "再生";
+          timeSpan.textContent = ctrl.totalSeconds > 0
+            ? `${formatTime(ctrl.elapsed)} / ${formatTime(ctrl.totalSeconds)}`
+            : "";
+        } else {
+          const isPlaying = !video.paused && !video.ended;
+          playButton.disabled = false;
+          playButton.textContent = isPlaying ? "一時停止" : "再生";
+          const total = isFinite(video.duration) ? video.duration : 0;
+          timeSpan.textContent = total > 0
+            ? `${formatTime(video.currentTime)} / ${formatTime(total)}`
+            : "";
+        }
       };
+
       ["loadstart", "loadedmetadata", "timeupdate", "play", "pause", "ended", "durationchange", "previewstatechange"].forEach((eventName) => {
         video.addEventListener(eventName, syncControls);
       });
       syncControls();
+    }
+
+    function formatTime(seconds) {
+      const s = Math.floor(seconds || 0);
+      const m = Math.floor(s / 60);
+      return `${m}:${String(s % 60).padStart(2, "0")}`;
     }
 
     function flashSeekNotice() {
@@ -1016,8 +1057,8 @@
       setCustomControlsVisible(video, true);
       previewWrap.classList.remove("hidden");
       previewFrame.dataset.previewUrl = previewUrl;
-      previewFrame.src = previewUrl;
-      video._previewController = createPreviewController(video, previewFrame, previewUrl, durationSeconds, previewEnded);
+      // Do not set frame.src yet — load only when user clicks play
+      video._previewController = createPreviewController(video, previewFrame, previewWrap, previewUrl, durationSeconds, previewEnded);
       video.dispatchEvent(new Event("previewstatechange"));
     }
 
@@ -1033,10 +1074,59 @@
       previewWrap.classList.add("hidden");
     }
 
-    function createPreviewController(video, frame, previewUrl, durationSeconds = 0, endedCallback = null) {
-      let timerId = 0;
+    function createPreviewController(video, frame, previewWrap, previewUrl, durationSeconds = 0, endedCallback = null) {
+      let endTimerId = 0;
+      let endTimerRemainingMs = durationSeconds > 0 ? Math.ceil((durationSeconds + 1) * 1000) : 0;
+      let endTimerStartedAt = 0;
+      let tickerId = 0;
+      let elapsedSeconds = 0;
+      let started = false;
+
+      // Overlay covers the iframe while paused so video keeps playing in background
+      const overlay = document.createElement("div");
+      overlay.className = "preview-pause-overlay";
+      previewWrap.appendChild(overlay);
+
+      function startEndTimer() {
+        if (endTimerRemainingMs <= 0) return;
+        endTimerStartedAt = Date.now();
+        endTimerId = window.setTimeout(() => {
+          endTimerId = 0;
+          controller.playing = false;
+          stopTicker();
+          video.dispatchEvent(new Event("previewstatechange"));
+          if (typeof endedCallback === "function") endedCallback();
+        }, endTimerRemainingMs);
+      }
+
+      function pauseEndTimer() {
+        if (!endTimerId) return;
+        window.clearTimeout(endTimerId);
+        endTimerId = 0;
+        endTimerRemainingMs -= Date.now() - endTimerStartedAt;
+        endTimerStartedAt = 0;
+      }
+
+      function startTicker() {
+        if (tickerId) return;
+        tickerId = window.setInterval(() => {
+          elapsedSeconds += 1;
+          controller.elapsed = elapsedSeconds;
+          video.dispatchEvent(new Event("previewstatechange"));
+        }, 1000);
+      }
+
+      function stopTicker() {
+        if (tickerId) {
+          window.clearInterval(tickerId);
+          tickerId = 0;
+        }
+      }
+
       const controller = {
         playing: false,
+        elapsed: 0,
+        totalSeconds: durationSeconds,
         toggle() {
           if (controller.playing) {
             controller.pause();
@@ -1045,36 +1135,29 @@
           }
         },
         play() {
-          controller.pause();
-          controller.playing = true;
-          frame.src = withAutoplay(previewUrl);
-          if (durationSeconds > 0) {
-            timerId = window.setTimeout(() => {
-              controller.playing = false;
-              timerId = 0;
-              video.dispatchEvent(new Event("previewstatechange"));
-              if (typeof endedCallback === "function") {
-                endedCallback();
-              }
-            }, Math.ceil((durationSeconds + 1) * 1000));
+          if (!started) {
+            started = true;
+            frame.src = withAutoplay(previewUrl);
           }
+          overlay.style.display = "none";
+          controller.playing = true;
+          startEndTimer();
+          startTicker();
           video.dispatchEvent(new Event("previewstatechange"));
         },
         pause() {
-          if (timerId) {
-            window.clearTimeout(timerId);
-            timerId = 0;
-          }
+          pauseEndTimer();
+          stopTicker();
           controller.playing = false;
-          frame.src = previewUrl;
+          // Show overlay to visually pause without reloading the iframe
+          overlay.style.display = "block";
           video.dispatchEvent(new Event("previewstatechange"));
         },
         destroy() {
-          if (timerId) {
-            window.clearTimeout(timerId);
-            timerId = 0;
-          }
+          pauseEndTimer();
+          stopTicker();
           controller.playing = false;
+          overlay.remove();
           frame.removeAttribute("src");
           video.dispatchEvent(new Event("previewstatechange"));
         }

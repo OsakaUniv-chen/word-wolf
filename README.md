@@ -5,4 +5,4 @@ Word Wolf Experiment
 
 GitHub Pages entry point:
 
-`https://OsakaUniv-chen.github.io/word-wolf-game/?workerId=xxxx`
+`https://OsakaUniv-chen.github.io/word-wolf/?workerId=xxxx`
