@@ -186,6 +186,18 @@
       user-select: none;
     }
 
+    /* Suppress all browser-native video controls */
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-panel,
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-volume-slider,
+    video::-webkit-media-controls-fullscreen-button,
+    video::-webkit-media-controls-overlay-play-button {
+      display: none !important;
+    }
+
     .media-wrap {
       display: block;
       width: 100%;
@@ -212,14 +224,14 @@
       pointer-events: none;
     }
 
-    /* Gradient fade covers Drive's floating control bar without a solid block */
+    /* Dark gradient covers Drive's floating control bar, blending with video content */
     .locked-preview-cover {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 56px;
-      background: linear-gradient(to bottom, transparent, #fff);
+      height: 64px;
+      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.92));
       pointer-events: auto;
       z-index: 2;
     }
@@ -758,45 +770,41 @@
 
       const controls = document.createElement("div");
       controls.className = "media-controls";
-      controls.innerHTML = `<button type="button" class="media-play">再生</button><span class="media-time"></span>`;
+      controls.innerHTML = `<button type="button" class="media-play">再生</button><span class="media-memo muted small">※ 再生後は停止・操作できません</span><span class="media-time"></span>`;
 
       const wrap = video.closest(".media-wrap");
       const insertTarget = wrap || video;
       insertTarget.insertAdjacentElement("afterend", controls);
 
       const playButton = controls.querySelector(".media-play");
+      const memoSpan = controls.querySelector(".media-memo");
       const timeSpan = controls.querySelector(".media-time");
 
       playButton.addEventListener("click", async () => {
         if (video._previewController) {
-          video._previewController.toggle();
+          video._previewController.play();
           return;
         }
         if (video.paused || video.ended) {
-          try {
-            await video.play();
-          } catch (error) {
-            console.error("Video playback was blocked:", error);
-          }
-        } else {
-          video.pause();
+          try { await video.play(); } catch (e) { console.error("Playback blocked:", e); }
         }
       });
 
       const syncControls = () => {
         if (video._previewController) {
           const ctrl = video._previewController;
-          playButton.disabled = false;
-          playButton.textContent = ctrl.playing ? "停止" : "再生";
-          timeSpan.textContent = ctrl.totalSeconds > 0
+          const playing = ctrl.playing;
+          playButton.style.display = playing ? "none" : "";
+          memoSpan.style.display = playing ? "none" : "";
+          timeSpan.textContent = playing && ctrl.totalSeconds > 0
             ? `${formatTime(ctrl.elapsed)} / ${formatTime(ctrl.totalSeconds)}`
             : "";
         } else {
           const isPlaying = !video.paused && !video.ended;
-          playButton.disabled = false;
-          playButton.textContent = isPlaying ? "停止" : "再生";
+          playButton.style.display = isPlaying ? "none" : "";
+          memoSpan.style.display = isPlaying ? "none" : "";
           const total = isFinite(video.duration) ? video.duration : 0;
-          timeSpan.textContent = total > 0
+          timeSpan.textContent = isPlaying && total > 0
             ? `${formatTime(video.currentTime)} / ${formatTime(total)}`
             : "";
         }
