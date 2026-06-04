@@ -671,6 +671,11 @@
       const audio = $("audioCheckPlayer");
       const playBtn = $("audioPlayButton");
       const timeDisplay = $("audioTimeDisplay");
+      const nextBtn = $("toRulesButton");
+
+      // Require the worker to play the sample once before advancing.
+      nextBtn.disabled = true;
+      audio.addEventListener("play", () => { nextBtn.disabled = false; }, { once: true });
 
       const update = () => {
         const playing = !audio.paused && !audio.ended;
