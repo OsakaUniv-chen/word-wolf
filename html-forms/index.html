@@ -1472,14 +1472,12 @@
       const isMobile = reasons.indexOf("mobile") !== -1;
       const badWindow = reasons.indexOf("window") !== -1;
       let message;
-      if (isMobile && badWindow) {
-        message = "本調査はパソコン専用です。スマートフォンやタブレットでは参加できません。また、ブラウザのウィンドウが小さすぎます。";
-      } else if (isMobile) {
-        message = "本調査はパソコン専用です。スマートフォンやタブレットでは参加できません。";
+      if (isMobile) {
+        message = "本調査はパソコン専用です。";
       } else {
-        message = `ブラウザのウィンドウが小さすぎます（必要サイズ：横${DEVICE_REQUIREMENTS.minWidth}×縦${DEVICE_REQUIREMENTS.minHeight}ピクセル以上）。`;
+        message = "ブラウザのウィンドウを大きくしてください。";
       }
-      $("deviceBlockMessage").textContent = message + "条件を満たさない場合、完了コードを取得できません。";
+      $("deviceBlockMessage").textContent = message;
       showOnly("deviceBlockSection");
     }
 
