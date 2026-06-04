@@ -427,15 +427,14 @@
         </div>
 
         <div class="button-row">
-          <button type="submit">ルール説明へ進む</button>
+          <button type="submit">次のページへ進む</button>
         </div>
       </form>
     </section>
 
     <section id="audioCheckSection" class="hidden">
       <h2>音声確認</h2>
-      <p>本調査では動画の音声が重要な情報を含んでいます。下の再生ボタンを押して音声をご確認ください。</p>
-      <p>音声がはっきり聞こえない場合は、パソコンやヘッドフォンの音量を調整してから次のページへ進んでください。</p>
+      <p>動画の音声には重要な情報が含まれます。下の再生ボタンで音声を確認し、はっきり聞こえるまで音量を調整してください。</p>
 
       <div class="audio-check-wrap">
         <audio id="audioCheckPlayer" src="audio-check.wav" preload="auto"></audio>
@@ -446,15 +445,15 @@
       </div>
 
       <div class="button-row" style="margin-top:24px">
-        <button id="toRulesButton" type="button">対話ゲーム「ワードウルフ」のルール確認へ進む</button>
+        <button id="toRulesButton" type="button">次のページへ進む</button>
       </div>
     </section>
 
     <section id="rulesSection" class="hidden">
-      <h2>対話ゲーム「ワードウルフ」のルール確認</h2>
-      <p>評価いただく動画では、3名のプレイヤーが「ワードウルフ」という対話ゲームを行っています。3人のうち2人には同じお題、1人には少し違うお題が与えられます。会話を通して、誰が少数派のウルフかを推理します。</p>
-      <p>あなたの役割は、動画を視聴して誰がウルフだったかを推測し、動画内のロボットやプレイヤーの様子を評価することです。</p>
-      <h3>ルール説明動画</h3>
+      <h2>対話ゲーム「ワードウルフ」</h2>
+      <p>「ワードウルフ」は3名で行う対話ゲームです。3人のうち2人には同じお題、1人には少し違うお題が与えられます。会話を通して、誰が少数派のウルフかを推理します。</p>
+      <h3>ゲームのルール説明</h3>
+      <p>下の再生ボタンを押して、ゲームのルールをご確認ください。</p>
       <div class="media-wrap">
         <video id="introVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="introPreviewWrap" class="locked-preview hidden">
@@ -469,7 +468,7 @@
     <section id="experimentSection" class="hidden">
       <div class="progress" id="videoProgress"></div>
       <h2 id="videoTitle"></h2>
-      <p>動画を最後まで視聴すると、下のアンケートが回答できるようになります。</p>
+      <p>動画を最後まで視聴すると、アンケートが回答できるようになります。</p>
       <div class="media-wrap">
         <video id="studyVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
         <div id="studyPreviewWrap" class="locked-preview hidden">
