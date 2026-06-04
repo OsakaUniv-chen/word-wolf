@@ -1434,7 +1434,7 @@
     function showOnly(sectionId) {
       recordCurrentPageTime();
       stopAllMedia(sectionId);
-      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "audioCheckSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
