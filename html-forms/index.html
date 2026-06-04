@@ -461,7 +461,7 @@
         </div>
       </div>
       <div class="button-row">
-        <button id="startExperimentButton" type="button">本番へ進む</button>
+        <button id="startExperimentButton" type="button" disabled>本番へ進む</button>
       </div>
     </section>
 
@@ -628,7 +628,10 @@
           video.fileName = `${video.stem}.mp4`;
         });
 
-        await setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS);
+        // Keep the rules-page advance button locked until the rule video finishes.
+        const unlockRulesNext = () => { $("startExperimentButton").disabled = false; };
+        $("introVideo").addEventListener("ended", unlockRulesNext);
+        await setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS, unlockRulesNext);
         bindEvents();
         showOnly("introSection");
       } catch (error) {
