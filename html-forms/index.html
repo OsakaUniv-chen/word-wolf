@@ -326,6 +326,21 @@
       font-weight: 800;
     }
 
+    .audio-check-wrap {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      background: #fbfbfa;
+      margin-top: 20px;
+    }
+
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
     @media (max-width: 760px) {
       header .wrap,
       .grid { display: block; }
@@ -426,6 +441,24 @@
           <button type="submit">ルール説明へ進む</button>
         </div>
       </form>
+    </section>
+
+    <section id="audioCheckSection" class="hidden">
+      <h2>音声確認</h2>
+      <p>本調査では動画の音声が重要な情報を含んでいます。下の再生ボタンを押して音声をご確認ください。</p>
+      <p>音声がはっきり聞こえない場合は、パソコンやヘッドフォンの音量を調整してから次のページへ進んでください。</p>
+
+      <div class="audio-check-wrap">
+        <audio id="audioCheckPlayer" src="audio-check.wav" preload="auto"></audio>
+        <div class="audio-controls">
+          <button type="button" id="audioPlayButton">再生</button>
+          <span id="audioTimeDisplay" class="media-time"></span>
+        </div>
+      </div>
+
+      <div class="button-row" style="margin-top:24px">
+        <button id="toRulesButton" type="button">ルール説明へ進む</button>
+      </div>
     </section>
 
     <section id="rulesSection" class="hidden">
@@ -785,6 +818,7 @@
 
     function bindEvents() {
       $("participantForm").addEventListener("submit", withButtonLock(onParticipantSubmit));
+      $("toRulesButton").addEventListener("click", withButtonLock(() => showOnly("rulesSection")));
       $("toPracticeButton").addEventListener("click", withButtonLock(() => showOnly("practiceSection")));
       $("practiceForm").addEventListener("submit", withButtonLock(onPracticeSubmit));
       $("startExperimentButton").addEventListener("click", withButtonLock(() => showOnly("experimentIntroSection")));
@@ -815,6 +849,35 @@
       };
     }
 
+    function initAudioCheck() {
+      const audio = $("audioCheckPlayer");
+      const playBtn = $("audioPlayButton");
+      const timeDisplay = $("audioTimeDisplay");
+
+      const update = () => {
+        const playing = !audio.paused && !audio.ended;
+        playBtn.textContent = playing ? "停止" : (audio.ended ? "もう一度再生" : "再生");
+        if (!audio.paused && isFinite(audio.duration) && audio.duration > 0) {
+          timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        } else {
+          timeDisplay.textContent = "";
+        }
+      };
+
+      ["play", "pause", "ended", "timeupdate", "loadedmetadata"].forEach((e) => audio.addEventListener(e, update));
+
+      playBtn.onclick = () => {
+        if (audio.paused || audio.ended) {
+          audio.currentTime = 0;
+          audio.play().catch((e) => console.error("Audio play blocked:", e));
+        } else {
+          audio.pause();
+        }
+      };
+
+      update();
+    }
+
     function onParticipantSubmit(event) {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
@@ -828,7 +891,8 @@
         age: String(data.get("age") || "").trim(),
         gender: String(data.get("gender") || "")
       };
-      showOnly("rulesSection");
+      showOnly("audioCheckSection");
+      initAudioCheck();
     }
 
     async function onPracticeSubmit(event) {
