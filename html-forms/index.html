@@ -367,6 +367,16 @@
       <p id="fatalMessage" class="error"></p>
     </section>
 
+    <section id="deviceBlockSection" class="hidden">
+      <h2>ご利用環境を確認してください</h2>
+      <p id="deviceBlockMessage" class="error"></p>
+      <ul class="muted small">
+        <li>スマートフォン・タブレットではなく、パソコンからアクセスしてください。</li>
+        <li>ブラウザのウィンドウを最大化し、横幅1280×高さ720ピクセル以上にしてください。</li>
+        <li>条件を満たした状態で、このページを再読み込みしてください。</li>
+      </ul>
+    </section>
+
     <section id="introSection" class="hidden">
       <h2>調査概要と同意確認</h2>
       <p>本調査は、人とロボットが参加する対話ゲームの様子が、第三者からどのように見えるかを調査する学術研究です。不快な映像や有害なコンテンツは含まれておりません。</p>
@@ -647,6 +657,8 @@
       maxSubmitAttempts: 3
     };
 
+    const DEVICE_REQUIREMENTS = { minWidth: 1280, minHeight: 720 };
+
     const INTRO_VIDEO_SECONDS = 93.1;
     const PRACTICE_VIDEO_SECONDS = 190.1;
     const STUDY_VIDEO_SECONDS = 185.1;
@@ -705,6 +717,7 @@
     const state = {
       workerId: "",
       evalSetId: "",
+      deviceInfo: null,
       enterAt: new Date().toISOString(),
       participant: null,
       practiceAnswer: "",
@@ -736,6 +749,13 @@
 
         if (!state.workerId) {
           showFatal("URLに有効な workerId が含まれていません。例: index.html?workerId=WORKER-xxxx");
+          return;
+        }
+
+        const deviceCheck = checkDeviceRequirements();
+        state.deviceInfo = deviceCheck.info;
+        if (!deviceCheck.ok) {
+          showDeviceBlock(deviceCheck.reasons);
           return;
         }
 
@@ -1131,6 +1151,7 @@
         evalSetId: state.evalSetId,
         enterAt: state.enterAt,
         submitAt: new Date().toISOString(),
+        deviceInfo: state.deviceInfo,
         participant: state.participant,
         practice: {
           answer: state.practiceAnswer,
@@ -1364,7 +1385,7 @@
     function showOnly(sectionId) {
       recordCurrentPageTime();
       stopAllMedia(sectionId);
-      ["loadingSection", "fatalSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
@@ -1422,6 +1443,59 @@
     function showFatal(message) {
       $("fatalMessage").textContent = message;
       showOnly("fatalSection");
+    }
+
+    function getDeviceInfo() {
+      const uaData = navigator.userAgentData || null;
+      return {
+        userAgent: navigator.userAgent || "",
+        uaMobile: uaData ? !!uaData.mobile : null,
+        platform: (uaData && uaData.platform) ? uaData.platform : (navigator.platform || ""),
+        maxTouchPoints: navigator.maxTouchPoints || 0,
+        coarsePointer: window.matchMedia("(pointer: coarse)").matches,
+        noHover: window.matchMedia("(hover: none)").matches,
+        screenWidth: window.screen ? window.screen.width : 0,
+        screenHeight: window.screen ? window.screen.height : 0,
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        devicePixelRatio: window.devicePixelRatio || 1,
+        language: navigator.language || ""
+      };
+    }
+
+    function isMobileDevice(info) {
+      if (info.uaMobile === true) return true;
+      if (/Android|iPhone|iPod|Windows Phone|BlackBerry|IEMobile|Opera Mini|iPad/i.test(info.userAgent)) return true;
+      // iPadOS reports a desktop "MacIntel" UA; multi-touch reveals it.
+      if (info.platform === "MacIntel" && info.maxTouchPoints > 1) return true;
+      // Heuristic combo: a touch-only, hover-less device is almost certainly mobile.
+      if (info.coarsePointer && info.noHover && info.maxTouchPoints > 0) return true;
+      return false;
+    }
+
+    function checkDeviceRequirements() {
+      const info = getDeviceInfo();
+      const reasons = [];
+      if (isMobileDevice(info)) reasons.push("mobile");
+      if (info.innerWidth < DEVICE_REQUIREMENTS.minWidth || info.innerHeight < DEVICE_REQUIREMENTS.minHeight) {
+        reasons.push("window");
+      }
+      return { ok: reasons.length === 0, reasons: reasons, info: info };
+    }
+
+    function showDeviceBlock(reasons) {
+      const isMobile = reasons.indexOf("mobile") !== -1;
+      const badWindow = reasons.indexOf("window") !== -1;
+      let message;
+      if (isMobile && badWindow) {
+        message = "本調査はパソコン専用です。スマートフォンやタブレットでは参加できません。また、ブラウザのウィンドウが小さすぎます。";
+      } else if (isMobile) {
+        message = "本調査はパソコン専用です。スマートフォンやタブレットでは参加できません。";
+      } else {
+        message = `ブラウザのウィンドウが小さすぎます（必要サイズ：横${DEVICE_REQUIREMENTS.minWidth}×縦${DEVICE_REQUIREMENTS.minHeight}ピクセル以上）。`;
+      }
+      $("deviceBlockMessage").textContent = message + "条件を満たさない場合、完了コードを取得できません。";
+      showOnly("deviceBlockSection");
     }
 
     function shuffle(items) {
