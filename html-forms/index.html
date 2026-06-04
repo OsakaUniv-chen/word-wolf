@@ -613,8 +613,6 @@
         <img id="placementImage" class="placement" src="" alt="プレイヤー配置">
       </div>
 
-      <div id="lockedNotice" class="status">動画を最後まで視聴してください。最後まで再生されるとアンケートが表示されます。</div>
-
       <form id="videoForm" class="hidden">
         <div id="questionMount"></div>
         <div class="button-row">
@@ -840,7 +838,6 @@
       $("videoTitle").textContent = `${state.currentIndex + 1}本目の評価`;
       await setImageSource($("placementImage"), video.imageName);
       $("placementImage").alt = `${video.stem} のプレイヤー配置`;
-      $("lockedNotice").classList.remove("hidden");
       $("videoForm").classList.add("hidden");
       $("seekNotice").classList.add("hidden");
       $("videoSubmitStatus").textContent = "";
@@ -882,7 +879,6 @@
     function unlockQuestionnaire() {
       if (!state.videoGuard) return;
       state.videoGuard.completed = true;
-      $("lockedNotice").classList.add("hidden");
       $("videoForm").classList.remove("hidden");
     }
 
