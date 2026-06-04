@@ -455,7 +455,7 @@
       </div>
       <div class="placement-block">
         <h3>プレイヤーA/B/Cの配置</h3>
-        <img id="practicePlacementImage" class="placement" src="" alt="練習セッションのプレイヤー配置">
+        <img id="practicePlacementImage" class="placement" src="player_position.png" alt="練習セッションのプレイヤー配置">
       </div>
 
       <form id="practiceForm">
@@ -620,7 +620,7 @@
 
       <div class="placement-block">
         <h3>プレイヤーA/B/Cの配置</h3>
-        <img id="placementImage" class="placement" src="" alt="プレイヤー配置">
+        <img id="placementImage" class="placement" src="player_position.png" alt="プレイヤー配置">
       </div>
 
       <form id="videoForm" class="hidden">
@@ -769,13 +769,11 @@
 
         state.videos.forEach((video) => {
           video.fileName = `${video.stem}.mp4`;
-          video.imageName = `${video.stem}.jpg`;
         });
 
         await Promise.all([
           setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS),
-          setVideoSource($("practiceVideo"), "practice-session.mp4", $("practicePreviewWrap"), $("practiceVideoPreview"), PRACTICE_VIDEO_SECONDS),
-          setImageSource($("practicePlacementImage"), "practice-session.jpg")
+          setVideoSource($("practiceVideo"), "practice-session.mp4", $("practicePreviewWrap"), $("practiceVideoPreview"), PRACTICE_VIDEO_SECONDS)
         ]);
         bindEvents();
         showOnly("introSection");
@@ -856,8 +854,6 @@
 
       $("videoProgress").textContent = `${state.currentIndex + 1} / ${state.videos.length} 本目`;
       $("videoTitle").textContent = `${state.currentIndex + 1}本目の評価`;
-      await setImageSource($("placementImage"), video.imageName);
-      $("placementImage").alt = `${video.stem} のプレイヤー配置`;
       $("videoForm").classList.add("hidden");
       $("seekNotice").classList.add("hidden");
       $("videoSubmitStatus").textContent = "";
@@ -1316,13 +1312,6 @@
       return controller;
     }
 
-    async function setImageSource(image, fileName) {
-      image.removeAttribute("src");
-      image.alt = image.alt || fileName;
-      const sourceUrl = await resolveMediaUrl("imageUrl", fileName);
-      image.src = driveImageUrl(sourceUrl);
-    }
-
     async function resolveMediaUrl(action, fileName) {
       const result = await fetchJson(`${CONFIG.gasWebAppUrl}?action=${action}&name=${encodeURIComponent(fileName)}`);
       if (result.url) return result.url;
@@ -1351,11 +1340,6 @@
 
     function withAutoplay(url) {
       return url.includes("?") ? `${url}&autoplay=1` : `${url}?autoplay=1`;
-    }
-
-    function driveImageUrl(url) {
-      const id = driveFileId(url);
-      return id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1600` : url;
     }
 
     async function fetchJson(url) {
