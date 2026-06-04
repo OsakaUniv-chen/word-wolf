@@ -1407,6 +1407,7 @@
 
     function stopAllMedia(activeSectionId) {
       document.querySelectorAll("video").forEach(pauseMedia);
+      document.querySelectorAll("audio").forEach((audio) => audio.pause());
       document.querySelectorAll(".locked-preview iframe").forEach((frame) => {
         const section = frame.closest("section");
         const isVisible = section && !section.classList.contains("hidden");

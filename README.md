@@ -1,6 +1,3 @@
-# word-wolf-game
-Word Wolf Experiment
-
 GitHub Repository: https://github.com/OsakaUniv-chen/word-wolf
 
 ## Crowdworker questionnaire
