@@ -396,7 +396,7 @@
       <h2>調査概要と同意確認</h2>
       <p>本調査は、人とロボットが参加する対話ゲームの様子が、第三者からどのように見えるかを調査する学術研究です。</p>
       <ol>
-        <li>ルールの確認と練習（最初のみ）</li>
+        <li>ルールの確認</li>
         <li>動画の視聴と評価（計4本、動画視聴：各約3分、評価回答：各約4分）</li>
         <li>完了コードの取得</li>
       </ol>
@@ -473,45 +473,7 @@
         </div>
       </div>
       <div class="button-row">
-        <button id="toPracticeButton" type="button">練習セッションへ進む</button>
-      </div>
-    </section>
-
-    <section id="practiceSection" class="hidden">
-      <h2>練習セッション</h2>
-      <p>本番の前に、練習用の短い動画で回答の流れを確認してください。この回答は研究分析データには含めませんが、回答記録として保存します。</p>
-      <div class="media-wrap">
-        <video id="practiceVideo" controlslist="nodownload noplaybackrate" disablepictureinpicture playsinline preload="metadata"></video>
-        <div id="practicePreviewWrap" class="locked-preview hidden">
-          <iframe id="practiceVideoPreview" title="練習セッション動画" allow="autoplay; fullscreen" allowfullscreen></iframe>
-        </div>
-      </div>
-      <div class="placement-block">
-        <h3>プレイヤーA/B/Cの配置</h3>
-        <img id="practicePlacementImage" class="placement" src="player_position_right.png" alt="練習セッションのプレイヤー配置">
-      </div>
-
-      <form id="practiceForm">
-        <fieldset>
-          <legend>この練習ゲームでは、誰がウルフだったと思いますか？</legend>
-          <div class="choice-row">
-            <label><input type="radio" name="practiceWolf" value="A" required> A</label>
-            <label><input type="radio" name="practiceWolf" value="B" required> B</label>
-            <label><input type="radio" name="practiceWolf" value="C" required> C</label>
-          </div>
-        </fieldset>
-        <div class="button-row">
-          <button type="submit">回答して正解を見る</button>
-          <span id="form1Status" class="muted small"></span>
-        </div>
-      </form>
-    </section>
-
-    <section id="practiceAnswerSection" class="hidden">
-      <h2>練習セッション：正解発表</h2>
-      <p id="practiceAnswerText" class="status"></p>
-      <div class="button-row">
-        <button id="startExperimentButton" type="button">本番へ進む</button>
+        <button id="toExperimentIntroButton" type="button">本番へ進む</button>
       </div>
     </section>
 
@@ -693,7 +655,6 @@
     const DEVICE_REQUIREMENTS = { minWidth: 1280, minHeight: 720 };
 
     const INTRO_VIDEO_SECONDS = 93.1;
-    const PRACTICE_VIDEO_SECONDS = 190.1;
     const STUDY_VIDEO_SECONDS = 185.1;
 
     const ROBOT_ITEMS = [
@@ -753,7 +714,6 @@
       deviceInfo: null,
       enterAt: new Date().toISOString(),
       participant: null,
-      practiceAnswer: "",
       videos: [],
       currentIndex: 0,
       currentVideo: null,
@@ -804,10 +764,7 @@
           video.fileName = `${video.stem}.mp4`;
         });
 
-        await Promise.all([
-          setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS),
-          setVideoSource($("practiceVideo"), "practice-session.mp4", $("practicePreviewWrap"), $("practiceVideoPreview"), PRACTICE_VIDEO_SECONDS)
-        ]);
+        await setVideoSource($("introVideo"), "Word-wolf-intro.mp4", $("introPreviewWrap"), $("introVideoPreview"), INTRO_VIDEO_SECONDS);
         bindEvents();
         showOnly("introSection");
       } catch (error) {
@@ -819,9 +776,7 @@
     function bindEvents() {
       $("participantForm").addEventListener("submit", withButtonLock(onParticipantSubmit));
       $("toRulesButton").addEventListener("click", withButtonLock(() => showOnly("rulesSection")));
-      $("toPracticeButton").addEventListener("click", withButtonLock(() => showOnly("practiceSection")));
-      $("practiceForm").addEventListener("submit", withButtonLock(onPracticeSubmit));
-      $("startExperimentButton").addEventListener("click", withButtonLock(() => showOnly("experimentIntroSection")));
+      $("toExperimentIntroButton").addEventListener("click", withButtonLock(() => showOnly("experimentIntroSection")));
       $("beginExperimentButton").addEventListener("click", withButtonLock(startExperiment));
       $("videoForm").addEventListener("submit", withButtonLock(onVideoSubmit));
       $("nextVideoButton").addEventListener("click", withButtonLock(onNextVideo));
@@ -893,14 +848,6 @@
       };
       showOnly("audioCheckSection");
       initAudioCheck();
-    }
-
-    async function onPracticeSubmit(event) {
-      event.preventDefault();
-      state.practiceAnswer = new FormData(event.currentTarget).get("practiceWolf");
-      $("form1Status").textContent = "";
-      $("practiceAnswerText").innerHTML = renderAnswerFeedback(state.practiceAnswer, "A");
-      showOnly("practiceAnswerSection");
     }
 
     async function startExperiment() {
@@ -1214,10 +1161,6 @@
         submitAt: new Date().toISOString(),
         deviceInfo: state.deviceInfo,
         participant: state.participant,
-        practice: {
-          answer: state.practiceAnswer,
-          correctAnswer: "A"
-        },
         videos: state.videos,
         pageTimes: state.pageTimes
       });
@@ -1434,7 +1377,7 @@
     function showOnly(sectionId) {
       recordCurrentPageTime();
       stopAllMedia(sectionId);
-      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "audioCheckSection", "rulesSection", "practiceSection", "practiceAnswerSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "audioCheckSection", "rulesSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
