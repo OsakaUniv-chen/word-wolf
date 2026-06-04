@@ -396,7 +396,8 @@
       <h2>調査概要と同意確認</h2>
       <p>本調査は、人とロボットが参加する対話ゲームの様子が、第三者からどのように見えるかを調査する学術研究です。</p>
       <ol>
-        <li>ルールの確認</li>
+        <li>音量の確認</li>
+        <li>対話ゲーム「ワードウルフ」のルール確認</li>
         <li>動画の視聴と評価（計4本、動画視聴：各約3分、評価回答：各約4分）</li>
         <li>完了コードの取得</li>
       </ol>
@@ -421,19 +422,6 @@
           <div>
             <label for="displayName">CrowdWorksの表示名</label>
             <input id="displayName" name="displayName" type="text" autocomplete="name" required>
-          </div>
-          <div>
-            <label for="age">年齢 半角数字</label>
-            <input id="age" name="age" type="number" min="18" max="80" inputmode="numeric" required>
-          </div>
-          <div>
-            <label for="gender">性別</label>
-            <select id="gender" name="gender" required>
-              <option value="">選択してください</option>
-              <option value="男性">男性</option>
-              <option value="女性">女性</option>
-              <option value="回答しない">回答しない</option>
-            </select>
           </div>
         </div>
 
@@ -717,9 +705,7 @@
       }
       state.participant = {
         consent: "agree",
-        displayName: String(data.get("displayName") || "").trim(),
-        age: String(data.get("age") || "").trim(),
-        gender: String(data.get("gender") || "")
+        displayName: String(data.get("displayName") || "").trim()
       };
       showOnly("audioCheckSection");
       initAudioCheck();
