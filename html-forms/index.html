@@ -473,131 +473,7 @@
         </div>
       </div>
       <div class="button-row">
-        <button id="toExperimentIntroButton" type="button">本番へ進む</button>
-      </div>
-    </section>
-
-    <section id="experimentIntroSection" class="hidden">
-      <h2>本番試験</h2>
-      <p>これから4本のワードウルフゲーム動画を順番に視聴し、それぞれについて評価を行っていただきます。<br>以下は各動画の視聴後に回答していただく設問のサンプルです。内容をご確認の上、次のページへ進んでください。</p>
-
-      <div class="question-block">
-        <h3>① ウルフの推測と理由</h3>
-        <p class="muted question-block-note">各動画の視聴後、2項目にご回答ください。</p>
-        <div class="question">
-          <p>このゲームでは、誰がウルフだったと思いますか？</p>
-          <div class="choice-row">
-            <label style="font-weight:500"><input type="radio" disabled> A</label>
-            <label style="font-weight:500"><input type="radio" disabled> B</label>
-            <label style="font-weight:500"><input type="radio" disabled> C</label>
-          </div>
-        </div>
-        <div class="question">
-          <p>そのように考えた理由を簡単に記入してください（任意）</p>
-          <textarea disabled placeholder="（自由記述）" style="color:var(--muted)"></textarea>
-        </div>
-      </div>
-
-      <div class="question-block">
-        <h3>② ロボットの印象評価</h3>
-        <p class="muted question-block-note">23項目・5段階評価。左右の形容詞のどちらに近いかを選んでください。以下は例です。</p>
-        <div class="question">
-          <div class="scale" role="presentation">
-            <div>偽物のような</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>自然な</div>
-          </div>
-        </div>
-        <div class="question">
-          <div class="scale" role="presentation">
-            <div>機械的</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>人間的</div>
-          </div>
-        </div>
-        <div class="question">
-          <div class="scale" role="presentation">
-            <div>意識を持たない</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>意識を持っている</div>
-          </div>
-        </div>
-        <p class="muted small">…他20項目</p>
-      </div>
-
-      <div class="question-block">
-        <h3>③ プレイヤーのゲーム体験</h3>
-        <p class="muted question-block-note">22項目・5段階評価。第三者視点から、動画内のプレイヤーがどのように見えたかを評価してください。以下は例です。</p>
-        <div class="question">
-          <p>プレイヤーはゲームに夢中だったように見えた</p>
-          <div class="scale" role="presentation">
-            <div>全く当てはまらない</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>非常に当てはまる</div>
-          </div>
-        </div>
-        <div class="question">
-          <p>プレイヤーは自分が上手だと感じていたように見えた</p>
-          <div class="scale" role="presentation">
-            <div>全く当てはまらない</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>非常に当てはまる</div>
-          </div>
-        </div>
-        <div class="question">
-          <p>プレイヤーは楽しかったように見えた</p>
-          <div class="scale" role="presentation">
-            <div>全く当てはまらない</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>非常に当てはまる</div>
-          </div>
-        </div>
-        <p class="muted small">…他19項目</p>
-      </div>
-
-      <div class="question-block">
-        <h3>④ ロボットとのインタラクションの楽しさ</h3>
-        <p class="muted question-block-note">1項目・5段階評価。</p>
-        <div class="question">
-          <p>動画に基づいて、プレイヤーはロボットとのインタラクションをどの程度楽しんでいたように見えましたか？</p>
-          <div class="scale" role="presentation">
-            <div>まったく楽しんでいなかったように見えた</div>
-            <label class="point"><input type="radio" disabled> 1</label>
-            <label class="point"><input type="radio" disabled> 2</label>
-            <label class="point"><input type="radio" disabled> 3</label>
-            <label class="point"><input type="radio" disabled> 4</label>
-            <label class="point"><input type="radio" disabled> 5</label>
-            <div>とても楽しんでいたように見えた</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="button-row">
-        <button id="beginExperimentButton" type="button">本試験を開始する</button>
+        <button id="startExperimentButton" type="button">本番へ進む</button>
       </div>
     </section>
 
@@ -776,8 +652,7 @@
     function bindEvents() {
       $("participantForm").addEventListener("submit", withButtonLock(onParticipantSubmit));
       $("toRulesButton").addEventListener("click", withButtonLock(() => showOnly("rulesSection")));
-      $("toExperimentIntroButton").addEventListener("click", withButtonLock(() => showOnly("experimentIntroSection")));
-      $("beginExperimentButton").addEventListener("click", withButtonLock(startExperiment));
+      $("startExperimentButton").addEventListener("click", withButtonLock(startExperiment));
       $("videoForm").addEventListener("submit", withButtonLock(onVideoSubmit));
       $("nextVideoButton").addEventListener("click", withButtonLock(onNextVideo));
     }
@@ -1377,14 +1252,14 @@
     function showOnly(sectionId) {
       recordCurrentPageTime();
       stopAllMedia(sectionId);
-      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "audioCheckSection", "rulesSection", "experimentIntroSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
+      ["loadingSection", "fatalSection", "deviceBlockSection", "introSection", "audioCheckSection", "rulesSection", "experimentSection", "answerSection", "completeSection"].forEach((id) => {
         $(id).classList.toggle("hidden", id !== sectionId);
       });
       startPageTimer(sectionId);
     }
 
     function startPageTimer(sectionId) {
-      if (sectionId === "fatalSection" || sectionId === "experimentIntroSection" || state.nextPageNumber > state.pageTimes.length) return;
+      if (sectionId === "fatalSection" || state.nextPageNumber > state.pageTimes.length) return;
       state.currentPageNumber = state.nextPageNumber;
       state.nextPageNumber += 1;
       state.currentPageStartedAt = Date.now();
