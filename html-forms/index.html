@@ -768,13 +768,35 @@
     }
 
     function bindEvents() {
-      $("participantForm").addEventListener("submit", onParticipantSubmit);
-      $("toPracticeButton").addEventListener("click", () => showOnly("practiceSection"));
-      $("practiceForm").addEventListener("submit", onPracticeSubmit);
-      $("startExperimentButton").addEventListener("click", () => showOnly("experimentIntroSection"));
-      $("beginExperimentButton").addEventListener("click", startExperiment);
-      $("videoForm").addEventListener("submit", onVideoSubmit);
-      $("nextVideoButton").addEventListener("click", onNextVideo);
+      $("participantForm").addEventListener("submit", withButtonLock(onParticipantSubmit));
+      $("toPracticeButton").addEventListener("click", withButtonLock(() => showOnly("practiceSection")));
+      $("practiceForm").addEventListener("submit", withButtonLock(onPracticeSubmit));
+      $("startExperimentButton").addEventListener("click", withButtonLock(() => showOnly("experimentIntroSection")));
+      $("beginExperimentButton").addEventListener("click", withButtonLock(startExperiment));
+      $("videoForm").addEventListener("submit", withButtonLock(onVideoSubmit));
+      $("nextVideoButton").addEventListener("click", withButtonLock(onNextVideo));
+    }
+
+    // Wraps a (possibly async) handler so the triggering button is disabled
+    // while it runs. This prevents multiple rapid clicks from queueing up
+    // several page switches when the handler is slow (e.g. loading a video or
+    // waiting on a network submit). For form "submit" events the form's submit
+    // button is disabled; for other events the clicked element is disabled.
+    function withButtonLock(handler) {
+      let running = false;
+      return async function (event) {
+        if (running) return;
+        const target = event.currentTarget;
+        const button = target.matches("form") ? target.querySelector('[type="submit"]') : target;
+        running = true;
+        if (button) button.disabled = true;
+        try {
+          await handler.call(this, event);
+        } finally {
+          running = false;
+          if (button) button.disabled = false;
+        }
+      };
     }
 
     function onParticipantSubmit(event) {
@@ -1018,8 +1040,6 @@
       event.preventDefault();
       const form = event.currentTarget;
       if (!form.reportValidity()) return;
-      const submitButton = $("submitVideoButton");
-      submitButton.disabled = true;
       $("videoSubmitStatus").textContent = "送信中...";
       const responses = collectResponses(new FormData(form));
       const video = state.currentVideo;
@@ -1052,8 +1072,6 @@
       } catch (error) {
         console.error(error);
         $("videoSubmitStatus").textContent = "送信に失敗しました。通信状況を確認して再度お試しください。";
-      } finally {
-        submitButton.disabled = false;
       }
     }
 
