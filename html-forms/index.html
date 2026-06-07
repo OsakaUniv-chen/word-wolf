@@ -936,12 +936,21 @@
       $("videoSubmitStatus").textContent = "送信中...";
       const responses = collectResponses(new FormData(form));
       const video = state.currentVideo;
+      // Flush the time spent on this eval page now so it can ride along with the
+      // form2 row. This keeps per-video timing even if the end-of-run form1
+      // (which carries the full pageTimes array) is never submitted.
+      recordCurrentPageTime();
+      const gameTime = state.currentPageNumber ? (state.pageTimes[state.currentPageNumber - 1] || 0) : 0;
+      const participant = state.participant || {};
 
       try {
         const result = await submitPayload({
           recordType: "form2",
           workerId: state.workerId,
           evalSetId: state.evalSetId,
+          workerName: participant.displayName || "",
+          consent: participant.consent || "",
+          gameTime: gameTime,
           video: {
             groupId: video.group_id,
             view: video.view,
